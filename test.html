@@ -612,8 +612,15 @@
 
             <!-- 商品列表 -->
             <div class="mt-8 bg-white rounded-lg shadow p-6">
-                <h3 class="text-xl font-bold mb-4 text-gray-800"><i class="fas fa-list mr-2"></i><span data-i18n="productManage">商品管理</span></h3>
-                <div id="admin-product-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+                    <h3 class="text-xl font-bold text-gray-800 flex items-center"><i class="fas fa-list mr-2"></i><span data-i18n="productManage">商品管理</span></h3>
+                    <div class="flex flex-wrap gap-2 text-sm">
+                        <button id="bulk-publish-btn" class="btn-press px-3 py-2 rounded-full bg-green-500 text-white hover:bg-green-600 flex items-center"><i class="fas fa-arrow-up mr-1"></i><span data-i18n="bulkOn">批量上架</span></button>
+                        <button id="bulk-unpublish-btn" class="btn-press px-3 py-2 rounded-full bg-yellow-500 text-white hover:bg-yellow-600 flex items-center"><i class="fas fa-arrow-down mr-1"></i><span data-i18n="bulkOff">批量下架</span></button>
+                        <button id="bulk-delete-btn" class="btn-press px-3 py-2 rounded-full bg-red-500 text-white hover:bg-red-600 flex items-center"><i class="fas fa-trash mr-1"></i><span data-i18n="bulkDelete">批量删除</span></button>
+                    </div>
+                </div>
+                <div id="admin-product-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"></div>
                 <div id="no-products-msg" class="text-center text-gray-500 py-8 hidden">
                     <i class="fas fa-box-open text-4xl mb-2"></i>
                     <p data-i18n="noProductsAdmin">暂无商品，请添加商品</p>
@@ -744,6 +751,11 @@
                 productManage: '商品管理',
                 noProductsAdmin: '暂无商品，请添加商品',
                 saveDownload: '保存并下载新文件',
+                bulkOn: '批量上架',
+                bulkOff: '批量下架',
+                bulkDelete: '批量删除',
+                statusOn: '已上架',
+                statusOff: '已下架',
                 productNote: '商品备注',
                 productNotePlaceholder: '输入备注（将显示在主页商品图片左下角）',
                 editProduct: '编辑商品',
@@ -1696,9 +1708,9 @@
             const productCount = document.getElementById('product-count');
             if (!productGrid || !productCount) return;
 
-            let filteredProducts = products;
+            let filteredProducts = products.filter(p => (p.status || 'on') !== 'off');
             if (categoryId && categoryId !== 'all') {
-                filteredProducts = products.filter(product => product.categoryId == categoryId);
+                filteredProducts = filteredProducts.filter(product => product.categoryId == categoryId);
             }
 
             productGrid.innerHTML = '';
@@ -1976,6 +1988,14 @@
             // 添加商品
             document.getElementById('add-product-btn').addEventListener('click', addNewProduct);
 
+            // 批量商品操作
+            const bulkOnBtn = document.getElementById('bulk-publish-btn');
+            const bulkOffBtn = document.getElementById('bulk-unpublish-btn');
+            const bulkDeleteBtn = document.getElementById('bulk-delete-btn');
+            if (bulkOnBtn) bulkOnBtn.addEventListener('click', () => handleBulkAction('on'));
+            if (bulkOffBtn) bulkOffBtn.addEventListener('click', () => handleBulkAction('off'));
+            if (bulkDeleteBtn) bulkDeleteBtn.addEventListener('click', () => handleBulkAction('delete'));
+
             // 保存更改
             document.getElementById('save-changes-btn').addEventListener('click', saveAndDownload);
 
@@ -2077,7 +2097,7 @@
                 return;
             }
 
-            const filteredProducts = products.filter(p => p.name.toLowerCase().includes(keyword));
+            const filteredProducts = products.filter(p => (p.status || 'on') !== 'off' && p.name.toLowerCase().includes(keyword));
 
             const productGrid = document.getElementById('product-grid');
             const productCount = document.getElementById('product-count');
@@ -2327,31 +2347,42 @@
 
             products.forEach(product => {
                 const categoryName = categories.find(c => c.id == product.categoryId)?.name || '未分类';
+                const status = product.status || 'on';
+                const statusBadge = status === 'off'
+                    ? `<span class="inline-flex items-center px-2 py-0.5 rounded-full bg-gray-200 text-gray-700 text-xs ml-2"><i class="fas fa-ban mr-1"></i>${t('statusOff') || '已下架'}</span>`
+                    : `<span class="inline-flex items-center px-2 py-0.5 rounded-full bg-green-100 text-green-700 text-xs ml-2"><i class="fas fa-check mr-1"></i>${t('statusOn') || '已上架'}</span>`;
+
                 const productCard = document.createElement('div');
-                productCard.className = 'border rounded-lg p-4 bg-gray-50';
+                productCard.className = 'border rounded-lg p-3 sm:p-4 bg-gray-50 flex gap-2';
                 productCard.innerHTML = `
-                    <div class="flex justify-between items-start gap-2">
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center gap-2">
-                                <img src="${getProductMainImage(product)}" class="w-10 h-10 object-contain rounded border bg-white" alt="${product.name}">
+                    <div class="pt-1">
+                        <input type="checkbox" class="bulk-product-checkbox w-4 h-4" data-product-id="${product.id}">
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex justify-between items-start gap-2">
+                            <div class="flex items-center gap-2 min-w-0">
+                                <img src="${getProductMainImage(product)}" class="w-10 h-10 object-contain rounded border bg-white flex-shrink-0" alt="${product.name}">
                                 <div class="min-w-0">
-                                    <h4 class="font-bold text-gray-800 truncate">${product.name}</h4>
-                                    <p class="text-sm text-gray-500">${t('productCategory')}: ${categoryName}</p>
+                                    <div class="flex items-center">
+                                        <h4 class="font-bold text-gray-800 truncate max-w-[9rem] sm:max-w-[11rem]">${product.name}</h4>
+                                        ${statusBadge}
+                                    </div>
+                                    <p class="text-xs sm:text-sm text-gray-500 mt-0.5">${t('productCategory')}: ${categoryName}</p>
                                 </div>
                             </div>
-                            <p class="text-red-500 font-bold mt-2">¥${product.price.toFixed(2)}</p>
-                            ${product.sizes && product.sizes.length > 0 ? `<p class="text-xs text-gray-400 mt-1">${t('sizes')}: ${product.sizes.join(', ')}</p>` : ''}
-                            ${product.types && product.types.length > 0 ? `<p class="text-xs text-gray-400">${t('types')}: ${product.types.join(', ')}</p>` : ''}
-                            ${product.note ? `<p class="text-xs text-blue-500 mt-1"><i class="fas fa-sticky-note mr-1"></i>${product.note}</p>` : ''}
+                            <div class="flex flex-col gap-1 flex-shrink-0">
+                                <button class="icon-btn edit-product text-blue-500 hover:text-blue-700 p-2" data-product-id="${product.id}" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="icon-btn delete-product text-red-500 hover:text-red-700 p-2" data-product-id="${product.id}" title="Delete">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
                         </div>
-                        <div class="flex flex-col gap-1">
-                            <button class="icon-btn edit-product text-blue-500 hover:text-blue-700 p-2" data-product-id="${product.id}" title="Edit">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="icon-btn delete-product text-red-500 hover:text-red-700 p-2" data-product-id="${product.id}" title="Delete">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
+                        <p class="text-red-500 font-bold mt-2 text-sm sm:text-base">¥${product.price.toFixed(2)}</p>
+                        ${product.sizes && product.sizes.length > 0 ? `<p class="text-[11px] sm:text-xs text-gray-400 mt-1">${t('sizes')}: ${product.sizes.join(', ')}</p>` : ''}
+                        ${product.types && product.types.length > 0 ? `<p class="text-[11px] sm:text-xs text-gray-400">${t('types')}: ${product.types.join(', ')}</p>` : ''}
+                        ${product.note ? `<p class="text-[11px] sm:text-xs text-blue-500 mt-1"><i class="fas fa-sticky-note mr-1"></i>${product.note}</p>` : ''}
                     </div>
                 `;
                 productList.appendChild(productCard);
@@ -2490,7 +2521,8 @@
                 types: types,
                 discount: discount,
                 discountStartTime: discountStartTime,
-                discountEndTime: discountEndTime
+                discountEndTime: discountEndTime,
+                status: 'on'
             };
 
             products.push(newProduct);
@@ -2756,6 +2788,30 @@
             if (!wrap) return;
             wrap.classList.add('hidden');
             wrap.innerHTML = '';
+        }
+
+        function getSelectedProductIdsForBulk() {
+            const checkboxes = document.querySelectorAll('.bulk-product-checkbox:checked');
+            return Array.from(checkboxes).map(cb => parseInt(cb.dataset.productId));
+        }
+
+        function handleBulkAction(action) {
+            const ids = getSelectedProductIdsForBulk();
+            if (ids.length === 0) return;
+
+            if (action === 'delete') {
+                if (!confirm(t('confirmDeleteProduct'))) return;
+                products = products.filter(p => !ids.includes(p.id));
+            } else if (action === 'on' || action === 'off') {
+                products.forEach(p => {
+                    if (ids.includes(p.id)) {
+                        p.status = action === 'on' ? 'on' : 'off';
+                    }
+                });
+            }
+
+            renderProducts();
+            renderAdminProductList();
         }
 
         // 保存并下载新的HTML文件
