@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>云端机库周边线上购物店铺 - 使用条款</title>
+    <!-- Tailwind CSS v3 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- AOS Animation Library -->
+    <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1a56db',
+                        secondary: '#e5edff',
+                        dark: '#1e293b',
+                        light: '#f8fafc',
+                        accent: '#3b82f6'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'card': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                        'card-hover': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .glass-effect {
+                background: rgba(255, 255, 255, 0.7);
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+            }
+            .transition-all-300 {
+                transition: all 300ms ease-in-out;
+            }
+        }
+        
+        /* 自定义滚动条 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        
+        /* 平滑滚动 */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* 章节高亮 */
+        .section-highlight {
+            background-color: rgba(59, 130, 246, 0.1);
+            border-left: 4px solid #3b82f6;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+    <!-- 顶部导航栏 -->
+    <header class="sticky top-0 z-50 bg-white shadow-md">
+        <nav class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <i class="fa fa-shopping-bag text-primary text-2xl"></i>
+                <span class="text-xl font-bold text-dark">云端机库周边</span>
+            </div>
+            <div class="hidden md:flex items-center space-x-6">
+                <a href="#overview" class="text-gray-600 hover:text-primary transition-all-300">概述</a>
+                <a href="#terms" class="text-gray-600 hover:text-primary transition-all-300">使用条款</a>
+                <a href="#privacy" class="text-gray-600 hover:text-primary transition-all-300">隐私政策</a>
+                <a href="#contact" class="text-gray-600 hover:text-primary transition-all-300">联系我们</a>
+            </div>
+            <button id="mobile-menu-button" class="md:hidden text-gray-600 focus:outline-none">
+                <i class="fa fa-bars text-xl"></i>
+            </button>
+        </nav>
+        <!-- 移动端菜单 -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-200">
+            <div class="container mx-auto px-4 py-2 flex flex-col space-y-2">
+                <a href="#overview" class="py-2 text-gray-600 hover:text-primary transition-all-300">概述</a>
+                <a href="#terms" class="py-2 text-gray-600 hover:text-primary transition-all-300">使用条款</a>
+                <a href="#privacy" class="py-2 text-gray-600 hover:text-primary transition-all-300">隐私政策</a>
+                <a href="#contact" class="py-2 text-gray-600 hover:text-primary transition-all-300">联系我们</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- 英雄区域 -->
+    <section class="bg-gradient-to-r from-primary to-blue-700 text-white py-16">
+        <div class="container mx-auto px-4 text-center" data-aos="fade-up" data-aos-duration="1000">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4 text-shadow">使用条款与服务协议</h1>
+            <p class="text-xl md:text-2xl max-w-3xl mx-auto opacity-90">
+                欢迎使用云端机库周边线上购物店铺服务，本协议旨在保护您的权益并规范双方行为
+            </p>
+            <div class="mt-8">
+                <a href="#terms" class="bg-white text-primary font-medium px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all-300 inline-flex items-center">
+                    <i class="fa fa-file-text-o mr-2"></i>查看完整条款
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 概述部分 -->
+    <section id="overview" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="max-w-4xl mx-auto" data-aos="fade-up">
+                <h2 class="text-3xl font-bold text-center mb-8 text-dark">条款概述</h2>
+                <div class="bg-light rounded-xl shadow-card p-6 md:p-8">
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="flex items-start space-x-4">
+                            <div class="bg-secondary p-3 rounded-full text-primary">
+                                <i class="fa fa-users text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-semibold mb-2 text-dark">用户权利与义务</h3>
+                                <p class="text-gray-600">明确用户在使用平台时享有的权利和应履行的义务，保障双方权益。</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-4">
+                            <div class="bg-secondary p-3 rounded-full text-primary">
+                                <i class="fa fa-shopping-bag text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-semibold mb-2 text-dark">商品交易规则</h3>
+                                <p class="text-gray-600">详细说明订单成立、商品发货、验收及退换货等交易流程和规则。</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-4">
+                            <div class="bg-secondary p-3 rounded-full text-primary">
+                                <i class="fa fa-shield text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-semibold mb-2 text-dark">知识产权保护</h3>
+                                <p class="text-gray-600">保护平台及用户的知识产权，明确内容使用权限和侵权责任。</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-4">
+                            <div class="bg-secondary p-3 rounded-full text-primary">
+                                <i class="fa fa-gavel text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-semibold mb-2 text-dark">争议解决</h3>
+                                <p class="text-gray-600">提供争议解决机制，确保双方在发生分歧时能够公平、高效地解决问题。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 使用条款主体部分 -->
+    <section id="terms" class="py-16 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="max-w-4xl mx-auto">
+                <h2 class="text-3xl font-bold text-center mb-12 text-dark" data-aos="fade-up">使用条款详情</h2>
+                
+                <!-- 条款导航 -->
+                <div class="hidden lg:block sticky top-24 float-right w-64 ml-8 mb-8 bg-white rounded-lg shadow-card p-4">
+                    <h3 class="text-lg font-semibold mb-4 text-dark border-b pb-2">条款目录</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#section-1" class="text-gray-600 hover:text-primary transition-all-300 flex items-center"><i class="fa fa-angle-right mr-2"></i>一、总则</a></li>
+                        <li><a href="#section-2" class="text-gray-600 hover:text-primary transition-all-300 flex items-center"><i class="fa fa-angle-right mr-2"></i>二、用户的权利与义务</a></li>
+                        <li><a href="#section-3" class="text-gray-600 hover:text-primary transition-all-300 flex items-center"><i class="fa fa-angle-right mr-2"></i>三、本店的权利与义务</a></li>
+                        <li><a href="#section-4" class="text-gray-600 hover:text-primary transition-all-300 flex items-center"><i class="fa fa-angle-right mr-2"></i>四、商品交易规则</a></li>
+                        <li><a href="#section-5" class="text-gray-600 hover:text-primary transition-all-300 flex items-center"><i class="fa fa-angle-right mr-2"></i>五、知识产权保护</a></li>
+                        <li><a href="#section-6" class="text-gray-600 hover:text-primary transition-all-300 flex items-center"><i class="fa fa-angle-right mr-2"></i>六、违约责任</a></li>
+                        <li><a href="#section-7" class="text-gray-600 hover:text-primary transition-all-300 flex items-center"><i class="fa fa-angle-right mr-2"></i>七、争议解决</a></li>
+                        <li><a href="#section-8" class="text-gray-600 hover:text-primary transition-all-300 flex items-center"><i class="fa fa-angle-right mr-2"></i>八、其他条款</a></li>
+                    </ul>
+                </div>
+                
+                <!-- 条款内容 -->
+                <div class="bg-white rounded-xl shadow-card p-6 md:p-8" data-aos="fade-up" data-aos-duration="800">
+                    <!-- 一、总则 -->
+                    <div id="section-1" class="mb-12 scroll-mt-24">
+                        <h3 class="text-2xl font-bold mb-6 text-dark flex items-center">
+                            <span class="bg-primary text-white w-8 h-8 rounded-full flex items-center justify-center mr-3">1</span>
+                            总则
+                        </h3>
+                        <div class="pl-4 border-l-2 border-gray-200">
+                            <p class="mb-4 text-gray-700"><strong class="text-dark">1.1</strong> 本使用协议（以下简称"本协议"）由云端机库周边线上购物店铺（以下简称"本店"）与使用本店线上平台服务的用户（以下简称"用户"）签订，旨在明确双方在平台使用及商品交易过程中的权利与义务。</p>
+                            
+                            <p class="mb-4 text-gray-700"><strong class="text-dark">1.2</strong> 本协议适用于用户通过本店线上平台（包括但不限于官方网站、微信小程序、电商平台店铺等）进行的所有浏览、注册、下单、支付、评价及参与活动等行为。</p>
+                            
+                            <p class="mb-4 text-gray-700"><strong class="text-dark">1.3</strong> 用户在使用本店服务前，应仔细阅读并理解本协议的全部内容。用户点击"同意"、"注册"、"下单"等按钮或实际使用本店服务，即视为已充分阅读、理解并同意本协议的全部条款，包括本店后续修订的内容。</p>
+                            
+                            <p class="text-gray-700"><strong class="text-dark">1.4</strong> 本店有权根据业务发展、法律法规更新等情况修订本协议，修订后的协议将通过平台公告、站内信等方式通知用户。用户继续使用本店服务的，视为同意修订后的协议；若用户不同意，应立即停止使用本店服务。</p>
+                        </div>
+                    </div>
+                    
+                    <!-- 二、用户的权利与义务 -->
+                    <div id="section-2" class="mb-12 scroll-mt-24">
+                        <h3 class="text-2xl font-bold mb-6 text-dark flex items-center">
+                            <span class="bg-primary text-white w-8 h-8 rounded-full flex items-center justify-center mr-3">2</span>
+                            用户的权利与义务
+                        </h3>
+                        <div class="pl-4 border-l-2 border-gray-200">
+                            <p class="mb-6 text-gray-700"><strong class="text-dark">2.1 用户的权利：</strong></p>
+                            
+                            <ul class="list-disc pl-6 mb-6 space-y-2 text-gray-700">
+                                <li>（1）有权在本店平台浏览商品信息、查询订单状态、享受售后服务等。</li>
+                                <li>（2）有权根据本店的活动规则，参与各类优惠、抽奖等活动。</li>
+                                <li>（3）有权对购买的商品进行评价、反馈，对本店的服务提出建议或投诉。</li>
+                                <li>（4）在符合本协议及相关法律法规规定的前提下，有权要求本店更正、删除个人信息，注销账号等（具体详见本协议附件《隐私条例》）。</li>
+                            </ul>
+                            
+                            <p class="mb-6 text-gray-700"><strong class="text-dark">2.2 用户的义务：</strong></p>
+                            
+                            <ul class="list-disc pl-6 space-y-2 text-gray-700">
+                                <li>（1）注册账号时，应提供真实、准确、完整的个人信息，不得使用虚假信息或冒用他人信息注册账号。若个人信息发生变更，应及时更新。</li>
+                                <li>（2）妥善保管账号及密码，对账号下的所有行为负责。若账号被盗用、泄露，应立即通知本店，并采取相应的安全措施。</li>
+                                <li>（3）使用本店服务时，应遵守法律法规、公序良俗及本协议的约定，不得从事任何违法违规或损害本店、其他用户合法权益的行为，包括但不限于：发布虚假信息、恶意攻击他人、盗用他人账号、刷单炒信、传播违法违规内容等。</li>
+                                <li>（4）下单购买商品时，应仔细核对商品信息、收货信息及支付信息，确保信息准确无误。因用户自身信息填写错误导致的商品错发、漏发、无法送达等后果，由用户自行承担。</li>
+                                <li>（5）应按照订单约定的时间完成支付，若逾期未支付，本店有权取消订单。</li>
+                                <li>（6）收到商品后，应及时查验商品数量、质量等情况。若发现商品存在问题，应在约定的售后服务期限内联系本店处理，不得擅自损坏、拆卸商品。</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <!-- 三、本店的权利与义务 -->
+                    <div id="section-3" class="mb-12 scroll-mt-24">
+                        <h3 class="text-2xl font-bold mb-6 text-dark flex items-center">
+                            <span class="bg-primary text-white w-8 h-8 rounded-full flex items-center justify-center mr-3">3</span>
+                            本店的权利与义务
+                        </h3>
+                        <div class="pl-4 border-l-2 border-gray-200">
+                            <p class="mb-6 text-gray-700"><strong class="text-dark">3.1 本店的权利：</strong></p>
+                            
+                            <ul class="list-disc pl-6 mb-6 space-y-2 text-gray-700">
+                                <li>（1）有权在平台上展示商品信息、发布活动规则、更新服务内容等。</li>
+                                <li>（2）有权对用户的账号信息、交易行为进行审核，若发现用户存在违法违规、违反本协议约定的行为，有权采取警告、限制账号功能、冻结账号、取消订单等措施，情节严重的，有权终止提供服务，并追究用户的法律责任。</li>
+                                <li>（3）因不可抗力、市场变化、商品缺货等原因，有权在提前通知用户的情况下，取消订单或调整商品价格、库存等信息（已支付订单取消的，将全额退还用户支付的款项）。</li>
+                                <li>（4）有权根据用户的评价、交易记录等信息，对用户进行信用评级，不同信用评级的用户可享受不同的服务权益。</li>
+                            </ul>
+                            
+                            <p class="mb-6 text-gray-700"><strong class="text-dark">3.2 本店的义务：</strong></p>
+                            
+                            <ul class="list-disc pl-6 space-y-2 text-gray-700">
+                                <li>（1）按照本协议约定，为用户提供稳定、安全的平台服务，保障用户的正常浏览、下单、支付等行为。</li>
+                                <li>（2）真实、准确、全面地展示商品信息，包括商品名称、规格、材质、价格、库存、售后服务等，不得发布虚假信息或隐瞒商品重要信息。</li>
+                                <li>（3）按照订单约定，及时安排商品发货，并提供物流跟踪信息。</li>
+                                <li>（4）建立完善的售后服务体系，及时响应用户的售后服务需求，妥善处理用户的咨询、投诉及商品退换货等问题。</li>
+                                <li>（5）严格保护用户的个人信息安全，按照本协议附件《隐私条例》的约定，收集、使用、存储及保护用户个人信息，不得擅自泄露、出售用户信息。</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <!-- 四、商品交易规则 -->
+                    <div id="section-4" class="mb-12 scroll-mt-24">
+                        <h3 class="text-2xl font-bold mb-6 text-dark flex items-center">
+                            <span class="bg-primary text-white w-8 h-8 rounded-full flex items-center justify-center mr-3">4</span>
+                            商品交易规则
+                        </h3>
+                        <div class="pl-4 border-l-2 border-gray-200">
+                            <p class="mb-4 text-gray-700"><strong class="text-dark">4.1</strong> 订单成立：用户在本店平台下单并完成支付后，订单即成立。订单成立后，双方应按照订单约定履行各自的义务。</p>
+                            
+                            <p class="mb-4 text-gray-700"><strong class="text-dark">4.2</strong> 商品发货：本店将在订单成立后的【X】个工作日内安排发货（特殊商品、预售商品或不可抗力因素除外，具体发货时间以商品详情页说明为准）。若因商品缺货、物流异常等原因导致无法按时发货，本店将及时通知用户，并协商解决方案。</p>
+                            
+                            <p class="mb-4 text-gray-700"><strong class="text-dark">4.3</strong> 商品验收：用户收到商品后，应在【X】个工作日内查验商品。若商品存在数量短缺、质量问题、型号不符等情况，应及时联系本店客服，并提供相关证据（如照片、视频等）。本店将根据实际情况，为用户提供退换货、补发、退款等解决方案。</p>
+                            
+                            <p class="mb-6 text-gray-700"><strong class="text-dark">4.4 退换货规则：</strong></p>
+                            
+                            <ul class="list-disc pl-6 mb-6 space-y-2 text-gray-700">
+                                <li>（1）商品在不影响二次销售的前提下（包装完好、无损坏、无使用痕迹），用户可在收到商品后的【X】天内申请退换货，运费由用户承担（商品质量问题、发错货等情况除外，运费由本店承担）。</li>
+                                <li>（2）定制商品、特价商品、贴身商品等特殊商品，若无质量问题，不支持退换货（具体以商品详情页说明为准）。</li>
+                                <li>（3）用户申请退换货时，应按照本店客服的指引，及时将商品寄回指定地址，并提供快递单号。本店收到退回商品并核实无误后，将在【X】个工作日内完成退款或换货流程。</li>
+                            </ul>
+                            
+                            <p class="text-gray-700"><strong class="text-dark">4.5</strong> 价格及库存说明：本店平台上的商品价格可能会因活动、市场波动等原因调整，具体价格以用户下单时的页面显示为准。商品库存实时更新，若用户下单后商品出现缺货，本店将及时通知用户，并协商取消订单或更换商品。</p>
+                        </div>
+                    </div>
+                    
+                    <!-- 五、知识产权保护 -->
+                    <div id="section-5" class="mb-12 scroll-mt-24">
+                        <h3 class="text-2xl font-bold mb-6 text-dark flex items-center">
+                            <span class="bg-primary text-white w-8 h-8 rounded-full flex items-center justify-center mr-3">5</span>
+                            知识产权保护
+                        </h3>
+                        <div class="pl-4 border-l-2 border-gray-200">
+                            <p class="mb-4 text-gray-700"><strong class="text-dark">5.1</strong> 本店平台上的所有内容，包括但不限于商品图片、文字描述、logo、商标、软件程序等，均受法律法规保护，其知识产权归本店或相关权利人所有。</p>
+                            
+                            <p class="mb-4 text-gray-700"><strong class="text-dark">5.2</strong> 未经本店或相关权利人书面授权，用户不得擅自复制、传播、修改、使用、转载平台上的任何内容，否则将承担相应的知识产权侵权责任。</p>
+                            
+                            <p class="text-gray-700"><strong class="text-dark">5.3</strong> 用户在平台上发布的评价、反馈等内容，授权本店可无偿、永久地使用，用于平台推广、商品宣传等用途，本店无需另行向用户支付任何费用。</p>
+                        </div>
+                    </div>
+                    
+                    <!-- 六、违约责任 -->
+                    <div id="section-6" class="mb-12 scroll-mt-24">
+                        <h3 class="text-2xl font-bold mb-6 text-dark flex items-center">
+                            <span class="bg-primary text-white w-8 h-8 rounded-full flex items-center justify-center mr-3">6</span>
+                            违约责任
+                        </h3>
+                        <div class="pl-4 border-l-2 border-gray-200">
+                            <p class="mb-4 text-gray-700"><strong class="text-dark">6.1</strong> 若用户违反本协议约定，给本店或其他用户造成损失的，应承担全部赔偿责任。本店有权根据用户的违约情节，采取警告、限制账号功能、冻结账号、终止服务等措施。</p>
+                            
+                            <p class="mb-4 text-gray-700"><strong class="text-dark">6.2</strong> 若本店违反本协议约定，未履行或未完全履行服务义务，给用户造成损失的，应承担相应的赔偿责任。</p>
+                            
+                            <p class="text-gray-700"><strong class="text-dark">6.3</strong> 因不可抗力（如自然灾害、战争、政策调整、网络故障等）导致双方无法履行本协议义务的，双方互不承担违约责任，但应及时通知对方，并采取相应的补救措施。</p>
+                        </div>
+                    </div>
+                    
+                    <!-- 七、争议解决 -->
+                    <div id="section-7" class="mb-12 scroll-mt-24">
+                        <h3 class="text-2xl font-bold mb-6 text-dark flex items-center">
+                            <span class="bg-primary text-white w-8 h-8 rounded-full flex items-center justify-center mr-3">7</span>
+                            争议解决
+                        </h3>
+                        <div class="pl-4 border-l-2 border-gray-200">
+                            <p class="text-gray-700"><strong class="text-dark">7.1</strong> 若双方就本协议的履行发生争议，应首先通过友好协商解决；协商不成的，任何一方均有权向本店所在地有管辖权的人民法院提起诉讼。</p>
+                        </div>
+                    </div>
+                    
+                    <!-- 八、其他条款 -->
+                    <div id="section-8" class="scroll-mt-24">
+                        <h3 class="text-2xl font-bold mb-6 text-dark flex items-center">
+                            <span class="bg-primary text-white w-8 h-8 rounded-full flex items-center justify-center mr-3">8</span>
+                            其他条款
+                        </h3>
+                        <div class="pl-4 border-l-2 border-gray-200">
+                            <p class="mb-4 text-gray-700"><strong class="text-dark">8.1</strong> 本协议的附件《隐私条例》为本协议不可分割的组成部分，与本协议具有同等法律效力。</p>
+                            
+                            <p class="mb-4 text-gray-700"><strong class="text-dark">8.2</strong> 若本协议中的任何条款被认定为无效或不可执行，不影响其他条款的效力，其他条款仍应继续履行。</p>
+                            
+                            <p class="mb-6 text-gray-700"><strong class="text-dark">8.3</strong> 本店的客服联系方式：</p>
+                            
+                            <ul class="list-disc pl-6 mb-6 space-y-2 text-gray-700">
+                                <li>客服电话：N/A</li>
+                                <li>电子邮箱：china.aviation.caac@gmail.com</li>
+                                <li>平台客服：通过本店线上平台的"联系客服"功能留言</li>
+                            </ul>
+                            
+                            <p class="text-gray-700"><strong class="text-dark">8.4</strong> 本协议自用户首次使用本店服务之日起生效。</p>
+                            
+                            <div class="mt-8 text-right">
+                                <p class="text-gray-700 font-medium">云端机库周边线上购物店铺</p>
+                                <p class="text-gray-500">发布日期：2026.01.10</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 隐私政策提示 -->
+    <section id="privacy" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="max-w-4xl mx-auto text-center" data-aos="fade-up">
+                <h2 class="text-3xl font-bold mb-6 text-dark">隐私政策</h2>
+                <p class="text-gray-600 mb-8 max-w-2xl mx-auto">
+                    我们重视您的隐私保护，《隐私条例》作为本协议的附件，详细说明了我们如何收集、使用和保护您的个人信息。
+                </p>
+                <div class="bg-secondary rounded-xl p-6 md:p-8 inline-block">
+                    <h3 class="text-xl font-semibold mb-4 text-dark">隐私条例摘要</h3>
+                    <ul class="text-left text-gray-700 space-y-3">
+                        <li class="flex items-start">
+                            <i class="fa fa-check-circle text-primary mt-1 mr-3"></i>
+                            <span>我们仅收集必要的个人信息，用于提供和优化服务</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa fa-check-circle text-primary mt-1 mr-3"></i>
+                            <span>我们采取严格的安全措施保护您的个人信息不被泄露</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa fa-check-circle text-primary mt-1 mr-3"></i>
+                            <span>我们不会未经您的授权向第三方分享您的个人信息</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa fa-check-circle text-primary mt-1 mr-3"></i>
+                            <span>您有权查询、更正、删除您的个人信息，以及注销账号</span>
+                        </li>
+                    </ul>
+                    <div class="mt-6 text-center">
+                        <button id="view-privacy-btn" class="bg-primary text-white font-medium px-6 py-2 rounded-lg hover:bg-blue-700 transition-all-300 inline-flex items-center">
+                            <i class="fa fa-file-text-o mr-2"></i>查看完整隐私条例
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 联系我们 -->
+    <section id="contact" class="py-16 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="max-w-4xl mx-auto" data-aos="fade-up">
+                <h2 class="text-3xl font-bold text-center mb-12 text-dark">联系我们</h2>
+                <div class="bg-white rounded-xl shadow-card p-6 md:p-8">
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="text-xl font-semibold mb-6 text-dark">联系方式</h3>
+                            <div class="space-y-4">
+                                <div class="flex items-start">
+                                    <div class="bg-secondary p-3 rounded-full text-primary mr-4">
+                                        <i class="fa fa-envelope"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-medium text-dark">电子邮箱</h4>
+                                        <p class="text-gray-600">china.aviation.caac@gmail.com</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start">
+                                    <div class="bg-secondary p-3 rounded-full text-primary mr-4">
+                                        <i class="fa fa-comments"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-medium text-dark">平台客服</h4>
+                                        <p class="text-gray-600">通过本店线上平台的"联系客服"功能留言</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 底部区域 -->
+    <footer class="bg-dark text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="max-w-6xl mx-auto">
+                <div class="grid md:grid-cols-4 gap-8">
+                    <div class="md:col-span-1">
+                        <div class="flex items-center space-x-2 mb-6">
+                            <i class="fa fa-shopping-bag text-white text-2xl"></i>
+                            <span class="text-xl font-bold">云端机库周边</span>
+                        </div>
+                        <p class="text-gray-400 mb-6">
+                            提供高质量的航空周边产品，为航空爱好者打造专属购物体验。
+                        </p>
+                        <div class="flex space-x-4">
+                            <a href="#" class="text-gray-400 hover:text-white transition-all-300">
+                                <i class="fa fa-weixin text-xl"></i>
+                            </a>
+                            <a href="#" class="text-gray-400 hover:text-white transition-all-300">
+                                <i class="fa fa-weibo text-xl"></i>
+                            </a>
+                            <a href="#" class="text-gray-400 hover:text-white transition-all-300">
+                                <i class="fa fa-instagram text-xl"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-semibold mb-4">快速链接</h4>
+                        <ul class="space-y-2">
+                            <li><a href="#overview" class="text-gray-400 hover:text-white transition-all-300">条款概述</a></li>
+                            <li><a href="#terms" class="text-gray-400 hover:text-white transition-all-300">使用条款</a></li>
+                            <li><a href="#privacy" class="text-gray-400 hover:text-white transition-all-300">隐私政策</a></li>
+                            <li><a href="#contact" class="text-gray-400 hover:text-white transition-all-300">联系我们</a></li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h4 class="text-lg font-semibold mb-4">联系方式</h4>
+                        <ul class="space-y-2">
+                            <li class="flex items-start">
+                                <i class="fa fa-envelope text-gray-400 mt-1 mr-2"></i>
+                                <span class="text-gray-400">china.aviation.caac@gmail.com</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fa fa-clock-o text-gray-400 mt-1 mr-2"></i>
+                                <span class="text-gray-400">周一至周日 9:00-22:00</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+                    <p>&copy; 2026 云端机库周边线上购物店铺. 保留所有权利.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 返回顶部按钮 -->
+    <button id="back-to-top" class="fixed bottom-8 right-8 bg-primary text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg opacity-0 invisible transition-all-300 hover:bg-blue-700">
+        <i class="fa fa-chevron-up"></i>
+    </button>
+
+    <!-- 隐私条例模态框 -->
+    <div id="privacy-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden">
+        <div class="absolute inset-0 bg-black bg-opacity-50" id="privacy-modal-overlay"></div>
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto relative z-10">
+            <div class="p-6 md:p-8">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-2xl font-bold text-dark">隐私条例</h3>
+                    <button id="close-privacy-modal" class="text-gray-500 hover:text-gray-700 focus:outline-none">
+                        <i class="fa fa-times text-xl"></i>
+                    </button>
+                </div>
+                <div class="prose max-w-none">
+                    <p class="mb-4">本隐私条例详细说明了云端机库周边线上购物店铺（以下简称"本店"）如何收集、使用、存储和保护用户的个人信息，以及用户享有的相关权利。</p>
+                    
+                    <h4 class="text-xl font-semibold mb-3">1. 信息收集</h4>
+                    <p class="mb-4">我们收集的信息包括但不限于：</p>
+                    <ul class="list-disc pl-6 mb-4 space-y-1">
+                        <li>个人基本信息（如姓名、性别、出生日期、身份证号等）</li>
+                        <li>联系方式（如手机号码、电子邮箱、通讯地址等）</li>
+                        <li>账户信息（如用户名、密码等）</li>
+                        <li>交易信息（如购买记录、支付记录、物流信息等）</li>
+                        <li>设备信息（如设备型号、操作系统、IP地址等）</li>
+                        <li>浏览信息（如浏览历史、搜索记录、关注商品等）</li>
+                    </ul>
+                    
+                    <h4 class="text-xl font-semibold mb-3">2. 信息使用</h4>
+                    <p class="mb-4">我们使用收集的信息用于：</p>
+                    <ul class="list-disc pl-6 mb-4 space-y-1">
+                        <li>提供、维护和优化我们的服务</li>
+                        <li>处理用户的订单、支付和配送</li>
+                        <li>提供客户服务和技术支持</li>
+                        <li>发送订单确认、物流通知等信息</li>
+                        <li>开展营销活动和个性化推荐</li>
+                        <li>防止欺诈和保障交易安全</li>
+                        <li>遵守法律法规的要求</li>
+                    </ul>
+                    
+                    <h4 class="text-xl font-semibold mb-3">3. 信息保护</h4>
+                    <p class="mb-4">我们采取以下措施保护用户信息：</p>
+                    <ul class="list-disc pl-6 mb-4 space-y-1">
+                        <li>使用加密技术保护数据传输和存储</li>
+                        <li>实施访问控制，限制对个人信息的访问</li>
+                        <li>定期进行安全评估和漏洞扫描</li>
+                        <li>制定数据安全事件响应计划</li>
+                        <li>对员工进行数据安全培训</li>
+                    </ul>
+                    
+                    <h4 class="text-xl font-semibold mb-3">4. 信息共享</h4>
+                    <p class="mb-4">我们不会未经用户授权向第三方分享个人信息，除非：</p>
+                    <ul class="list-disc pl-6 mb-4 space-y-1">
+                        <li>获得用户的明确同意</li>
+                        <li>与我们的关联公司共享，用于提供服务</li>
+                        <li>与服务提供商共享，用于处理订单、支付、配送等</li>
+                        <li>根据法律法规要求或政府部门的命令</li>
+                        <li>为保护本店、用户或公众的权利、财产或安全</li>
+                    </ul>
+                    
+                    <h4 class="text-xl font-semibold mb-3">5. 用户权利</h4>
+                    <p class="mb-4">用户享有以下权利：</p>
+                    <ul class="list-disc pl-6 mb-4 space-y-1">
+                        <li>查询、更正、删除个人信息</li>
+                        <li>要求限制个人信息的处理</li>
+                        <li>要求数据可携带性</li>
+                        <li>拒绝某些数据处理（如营销活动）</li>
+                        <li>注销账号</li>
+                    </ul>
+                    
+                    <h4 class="text-xl font-semibold mb-3">6. Cookie政策</h4>
+                    <p class="mb-4">我们使用Cookie和类似技术来：</p>
+                    <ul class="list-disc pl-6 mb-4 space-y-1">
+                        <li>记住用户的登录状态</li>
+                        <li>分析网站使用情况</li>
+                        <li>提供个性化内容和广告</li>
+                        <li>改善用户体验</li>
+                    </ul>
+                    <p class="mb-4">用户可以通过浏览器设置管理Cookie，但可能会影响某些功能的使用。</p>
+                    
+                    <h4 class="text-xl font-semibold mb-3">7. 未成年人保护</h4>
+                    <p class="mb-4">我们不主动收集未成年人的个人信息。如果发现未成年人的信息，我们将立即删除。</p>
+                    
+                    <h4 class="text-xl font-semibold mb-3">8. 隐私条例更新</h4>
+                    <p class="mb-4">我们可能会不时更新本隐私条例，并通过平台公告等方式通知用户。</p>
+                    
+                    <h4 class="text-xl font-semibold mb-3">9. 联系我们</h4>
+                    <p>如果用户对本隐私条例有任何疑问，可通过以下方式联系我们：</p>
+                    <p>电子邮箱：china.aviation.caac@gmail.com</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 初始化AOS动画库
+        document.addEventListener('DOMContentLoaded', function() {
+            AOS.init({
+                duration: 800,
+                once: true,
+                offset: 100
+            });
+            
+            // 移动端菜单切换
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            
+            mobileMenuButton.addEventListener('click', function() {
+                mobileMenu.classList.toggle('hidden');
+                const icon = mobileMenuButton.querySelector('i');
+                if (mobileMenu.classList.contains('hidden')) {
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                } else {
+                    icon.classList.remove('fa-bars');
+                    icon.classList.add('fa-times');
+                }
+            });
+            
+            // 移动端菜单项点击后关闭菜单
+            const mobileMenuItems = mobileMenu.querySelectorAll('a');
+            mobileMenuItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    mobileMenu.classList.add('hidden');
+                    const icon = mobileMenuButton.querySelector('i');
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                });
+            });
+            
+            // FAQ问答切换
+            const faqQuestions = document.querySelectorAll('.faq-question');
+            faqQuestions.forEach(question => {
+                question.addEventListener('click', function() {
+                    const answer = this.nextElementSibling;
+                    const icon = this.querySelector('i');
+                    
+                    answer.classList.toggle('hidden');
+                    
+                    if (answer.classList.contains('hidden')) {
+                        icon.classList.remove('fa-chevron-up');
+                        icon.classList.add('fa-chevron-down');
+                    } else {
+                        icon.classList.remove('fa-chevron-down');
+                        icon.classList.add('fa-chevron-up');
+                    }
+                });
+            });
+            
+            // 返回顶部按钮
+            const backToTopButton = document.getElementById('back-to-top');
+            
+            window.addEventListener('scroll', function() {
+                if (window.pageYOffset > 300) {
+                    backToTopButton.classList.remove('opacity-0', 'invisible');
+                    backToTopButton.classList.add('opacity-100', 'visible');
+                } else {
+                    backToTopButton.classList.remove('opacity-100', 'visible');
+                    backToTopButton.classList.add('opacity-0', 'invisible');
+                }
+            });
+            
+            backToTopButton.addEventListener('click', function() {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+            
+            // 隐私条例模态框
+            const viewPrivacyBtn = document.getElementById('view-privacy-btn');
+            const privacyModal = document.getElementById('privacy-modal');
+            const closePrivacyModal = document.getElementById('close-privacy-modal');
+            const privacyModalOverlay = document.getElementById('privacy-modal-overlay');
+            
+            viewPrivacyBtn.addEventListener('click', function() {
+                privacyModal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            });
+            
+            function closeModal() {
+                privacyModal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+            
+            closePrivacyModal.addEventListener('click', closeModal);
+            privacyModalOverlay.addEventListener('click', closeModal);
+            
+            // 章节高亮
+            const sections = document.querySelectorAll('[id^="section-"]');
+            const navLinks = document.querySelectorAll('.lg\\:block a');
+            
+            window.addEventListener('scroll', function() {
+                let current = '';
+                
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    const sectionHeight = section.clientHeight;
+                    if (window.pageYOffset >= sectionTop - 200) {
+                        current = section.getAttribute('id');
+                    }
+                });
+                
+                sections.forEach(section => {
+                    if (section.getAttribute('id') === current) {
+                        section.classList.add('section-highlight');
+                    } else {
+                        section.classList.remove('section-highlight');
+                    }
+                });
+                
+                navLinks.forEach(link => {
+                    link.classList.remove('text-primary', 'font-medium');
+                    link.classList.add('text-gray-600');
+                    if (link.getAttribute('href').substring(1) === current) {
+                        link.classList.remove('text-gray-600');
+                        link.classList.add('text-primary', 'font-medium');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
