@@ -1,0 +1,1779 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>云端商城 - Pinduoduo Style</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* Custom Theme Colors */
+        :root {
+            --primary: #FF4400;
+            --primary-hover: #e03c00;
+            --bg-gray: #f4f4f4;
+            --text-main: #333333;
+            --text-sub: #888888;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-gray);
+            color: var(--text-main);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Improved Animations */
+        @keyframes slideDownBounce {
+            0% { transform: translate(-50%, -100px); opacity: 0; }
+            70% { transform: translate(-50%, 30px); opacity: 1; }
+            100% { transform: translate(-50%, 20px); opacity: 1; }
+        }
+        @keyframes slideUpFade {
+            from { transform: translate(-50%, 20px); opacity: 1; }
+            to { transform: translate(-50%, -60px); opacity: 0; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes zoomIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes slideInRight {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+
+        .toast-enter { animation: slideDownBounce 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        .toast-exit { animation: slideUpFade 0.3s ease-in forwards; }
+
+        .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
+        .animate-zoom-in { animation: zoomIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+        .animate-slide-in { animation: slideInRight 0.3s ease-out forwards; }
+
+        /* Marquee Animation */
+        @keyframes marquee {
+            0% { transform: translate3d(0, 0, 0); }
+            100% { transform: translate3d(-50%, 0, 0); }
+        }
+        .marquee-container {
+            width: 100%;
+            overflow: hidden;
+            white-space: nowrap;
+            position: relative;
+        }
+        .marquee-content {
+            display: flex;
+            white-space: nowrap;
+            animation: marquee 60s linear infinite;
+            will-change: transform;
+            width: max-content;
+            align-items: center;
+        }
+        .marquee-item {
+            padding-right: 6rem; /* Increased spacing for slower speed */
+            flex-shrink: 0;
+            font-weight: 500;
+        }
+        .marquee-content:hover {
+            animation-play-state: paused;
+        }
+
+        /* Button Interactions */
+        .btn-interact {
+            transition: all 0.2s;
+        }
+        .btn-interact:hover {
+            transform: translateY(-1px) scale(1.01);
+            box-shadow: 0 4px 10px rgba(255, 68, 0, 0.15);
+        }
+        .btn-interact:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        /* Icon Interactions */
+        .icon-hover:hover {
+            transform: scale(1.1);
+            transition: transform 0.2s;
+        }
+
+        /* Custom Scrollbar */
+        .custom-scroll::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #ddd;
+            border-radius: 10px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb:hover {
+            background: #ccc;
+        }
+
+        /* Utilities */
+        .text-primary { color: var(--primary); }
+        .bg-primary { background-color: var(--primary); }
+        .border-primary { border-color: var(--primary); }
+        .focus-primary:focus { 
+            border-color: var(--primary); 
+            box-shadow: 0 0 0 3px rgba(255, 68, 0, 0.1); 
+            outline: none;
+        }
+        
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(2px);
+        }
+
+        /* Carousel scroll snap */
+        .snap-x {
+            scroll-snap-type: x mandatory;
+        }
+        .snap-center {
+            scroll-snap-align: center;
+        }
+
+        [x-cloak] { display: none !important; }
+    </style>
+</head>
+<body class="min-h-screen relative">
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed top-0 left-1/2 transform -translate-x-1/2 z-[1000] pointer-events-none w-full max-w-xs md:max-w-sm px-4"></div>
+
+    <!-- MAIN APP CONTAINER -->
+    <div id="app" class="relative">
+        
+        <!-- === VIEW: FRONTEND === -->
+        <div id="view-frontend" class="min-h-screen pb-20">
+            <!-- Header -->
+            <header class="bg-white sticky top-0 z-30 shadow-sm">
+                <!-- Notification Bar -->
+                <div id="notification-bar" class="bg-orange-50 text-orange-600 py-2.5 hidden border-b border-orange-100 shadow-inner">
+                    <div class="marquee-container">
+                        <div class="marquee-content" id="notification-text"></div>
+                    </div>
+                </div>
+                
+                <div class="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
+                    <div class="font-bold text-lg text-primary flex items-center gap-2">
+                        <div class="w-8 h-8 bg-primary text-white rounded-lg flex items-center justify-center shadow-sm">
+                            <i class="fas fa-shopping-bag text-sm"></i>
+                        </div>
+                        <span id="shop-name-display" class="tracking-tight">云端商城</span>
+                    </div>
+                    <div class="flex items-center gap-3 md:gap-4 text-gray-500">
+                        <button onclick="openCart()" class="relative icon-hover p-2 hover:text-primary transition-colors">
+                            <i class="fas fa-shopping-cart text-lg"></i>
+                            <span id="cart-count" class="absolute top-0 right-0 bg-primary text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center hidden border-2 border-white font-bold">0</span>
+                        </button>
+                        <button onclick="openContactModal()" class="icon-hover p-2 hover:text-primary transition-colors">
+                            <i class="fas fa-phone text-lg"></i>
+                        </button>
+                        <button onclick="handleGearClick()" class="icon-hover p-2 hover:text-primary transition-colors">
+                            <i class="fas fa-cog text-lg"></i>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main Layout with Category Sidebar -->
+            <main class="max-w-7xl mx-auto flex flex-col md:flex-row gap-4 px-3 py-4">
+                <!-- Left Sidebar Category -->
+                <aside class="w-full md:w-48 flex-shrink-0">
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden sticky top-20">
+                        <div class="p-3 border-b bg-gray-50/50 text-[10px] font-bold text-gray-400 uppercase tracking-wider">商品分类</div>
+                        <nav id="category-sidebar" class="p-2 space-y-1 max-h-[60vh] overflow-y-auto custom-scroll">
+                            <!-- Categories injected here -->
+                        </nav>
+                    </div>
+                </aside>
+
+                <!-- Product Grid -->
+                <div id="product-list" class="flex-1 grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+                    <!-- Products injected here -->
+                    <div class="col-span-full text-center py-32 text-gray-400 animate-fade-in">
+                        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-box-open text-3xl text-gray-300"></i>
+                        </div>
+                        <p class="font-semibold text-sm">暂无商品，请在后台添加</p>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- === VIEW: ADMIN LOGIN === -->
+        <div id="view-admin-login" class="hidden fixed inset-0 bg-gray-100 z-50 flex items-center justify-center p-4">
+            <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-sm animate-zoom-in">
+                <div class="text-center mb-8">
+                    <div class="w-16 h-16 bg-primary/10 text-primary rounded-2xl flex items-center justify-center mx-auto mb-4 text-3xl">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-800">管理员登录</h2>
+                    <p class="text-sm text-gray-500 mt-2">请输入后台访问密码</p>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">访问密码</label>
+                        <input type="password" id="admin-password" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus-primary transition-all text-lg" placeholder="••••••••">
+                    </div>
+                    <button onclick="loginAdmin()" class="w-full bg-primary text-white py-4 rounded-xl font-bold btn-interact shadow-lg shadow-orange-100">登 录</button>
+                    <button onclick="closeModal('admin-login')" class="w-full text-gray-400 py-2 text-sm hover:text-gray-600 transition-colors">返回商城</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- === VIEW: ADMIN DASHBOARD === -->
+        <div id="view-admin-dashboard" class="hidden min-h-screen bg-gray-50 flex flex-col md:flex-row">
+            <!-- Sidebar -->
+            <aside class="w-full md:w-64 bg-white shadow-xl z-20 flex-shrink-0 border-r border-gray-100">
+                <div class="p-6 border-b border-gray-50 flex items-center justify-between">
+                    <span class="font-bold text-xl text-primary tracking-tight">管理后台</span>
+                    <button onclick="logoutAdmin()" class="text-gray-300 hover:text-red-500 transition-colors"><i class="fas fa-power-off text-lg"></i></button>
+                </div>
+                <nav id="admin-sidebar-nav" class="p-4 space-y-1">
+                    <button data-tab="products" onclick="switchAdminTab('products')" class="admin-nav-btn w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 transition-all">
+                        <i class="fas fa-box"></i> <span class="text-sm font-semibold">货品管理</span>
+                    </button>
+                    <button data-tab="categories" onclick="switchAdminTab('categories')" class="admin-nav-btn w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 transition-all">
+                        <i class="fas fa-tags"></i> <span class="text-sm font-semibold">分类管理</span>
+                    </button>
+                    <button data-tab="contacts" onclick="switchAdminTab('contacts')" class="admin-nav-btn w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 transition-all">
+                        <i class="fas fa-address-book"></i> <span class="text-sm font-semibold">联系方式</span>
+                    </button>
+                    <button data-tab="settings" onclick="switchAdminTab('settings')" class="admin-nav-btn w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 transition-all">
+                        <i class="fas fa-cog"></i> <span class="text-sm font-semibold">网站设置</span>
+                    </button>
+                    <button data-tab="data" onclick="switchAdminTab('data')" class="admin-nav-btn w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 transition-all">
+                        <i class="fas fa-database"></i> <span class="text-sm font-semibold">数据管理</span>
+                    </button>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="flex-1 p-4 md:p-8 overflow-y-auto h-screen custom-scroll">
+                
+                <!-- Tab: Products -->
+                <div id="tab-products" class="admin-tab-content">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-800">货品管理</h2>
+                            <p class="text-gray-400 text-sm">管理您的商品库存与展示状态</p>
+                        </div>
+                        <button onclick="openProductEditor()" class="bg-primary text-white px-6 py-3 rounded-xl font-bold btn-interact shadow-lg shadow-orange-100 flex items-center gap-2">
+                            <i class="fas fa-plus"></i> 新增商品
+                        </button>
+                    </div>
+
+                    <!-- Batch Operations -->
+                    <div class="bg-white p-4 rounded-xl shadow-sm mb-6 flex flex-wrap items-center gap-3 border border-gray-100">
+                        <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mr-2">批量操作</span>
+                        <button onclick="batchProductAction('on_shelf')" class="px-3 py-1.5 bg-green-50 text-green-600 rounded-lg text-xs font-semibold hover:bg-green-100 transition-colors">上架</button>
+                        <button onclick="batchProductAction('off_shelf')" class="px-3 py-1.5 bg-gray-50 text-gray-600 rounded-lg text-xs font-semibold hover:bg-gray-100 transition-colors">下架</button>
+                        <button onclick="batchProductAction('set_normal')" class="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-xs font-semibold hover:bg-blue-100 transition-colors">设为正常</button>
+                        <button onclick="batchProductAction('set_out_stock')" class="px-3 py-1.5 bg-red-50 text-red-600 rounded-lg text-xs font-semibold hover:bg-red-100 transition-colors">设为缺货</button>
+                        <button onclick="batchProductAction('delete')" class="px-3 py-1.5 bg-red-600 text-white rounded-lg text-xs font-semibold hover:bg-red-700 ml-auto shadow-sm">删除选中</button>
+                    </div>
+
+                    <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead class="bg-gray-50 text-gray-400 text-[10px] font-black uppercase tracking-widest">
+                                    <tr>
+                                        <th class="p-5 w-10"><input type="checkbox" id="select-all-products" onchange="toggleSelectAll(this)" class="rounded text-primary focus:ring-primary"></th>
+                                        <th class="p-5">预览</th>
+                                        <th class="p-5">商品信息</th>
+                                        <th class="p-5">价格</th>
+                                        <th class="p-5">状态控制</th>
+                                        <th class="p-5 text-right">管理</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-product-list" class="divide-y divide-gray-50 text-sm">
+                                    <!-- Product Rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab: Categories Management -->
+                <div id="tab-categories" class="admin-tab-content hidden">
+                    <h2 class="text-3xl font-black text-gray-800 mb-8">分类管理</h2>
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                             <table class="w-full text-left border-collapse">
+                                <thead class="bg-gray-50 text-gray-400 text-[10px] font-black uppercase tracking-widest">
+                                    <tr>
+                                        <th class="p-5">分类名称</th>
+                                        <th class="p-5 text-right">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-category-list" class="divide-y divide-gray-50 text-sm">
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 h-fit">
+                            <h3 class="font-black text-lg mb-6 text-gray-800">添加新分类</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">分类名称</label>
+                                    <input type="text" id="new-category-name" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus-primary" placeholder="输入分类名称">
+                                </div>
+                                <button onclick="addCategory()" class="w-full bg-primary text-white py-3.5 rounded-xl font-bold btn-interact shadow-lg shadow-orange-100">立即添加</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab: Contacts -->
+                <div id="tab-contacts" class="admin-tab-content hidden">
+                    <h2 class="text-3xl font-black text-gray-800 mb-8">联系方式管理</h2>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <!-- Contact List -->
+                        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col h-[600px]">
+                            <div class="p-5 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
+                                <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">列表预览 (可滚动)</span>
+                                <span class="text-[10px] text-primary font-bold">LIVE PREVIEW</span>
+                            </div>
+                            <div class="flex-1 overflow-y-auto custom-scroll p-2 space-y-2" id="admin-contact-list">
+                                <!-- Contact Items -->
+                            </div>
+                        </div>
+
+                        <!-- Add/Edit Form -->
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 h-fit">
+                            <h3 class="font-black text-xl mb-6 text-primary" id="contact-form-title">添加新联系方式</h3>
+                            <input type="hidden" id="contact-edit-id">
+                            <div class="space-y-5">
+                                <div>
+                                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">平台名称</label>
+                                    <input type="text" id="contact-platform" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus-primary" placeholder="例如：微信 / Telegram">
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">图标 (FA类名)</label>
+                                        <input type="text" id="contact-icon" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus-primary" placeholder="fab fa-weixin">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">图标颜色</label>
+                                        <input type="color" id="contact-color" class="w-full h-12 border border-gray-200 rounded-xl cursor-pointer p-1.5" value="#000000">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">显示内容</label>
+                                    <input type="text" id="contact-content" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus-primary" placeholder="例如：USER_ID">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">跳转链接 (可选)</label>
+                                    <input type="text" id="contact-link" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus-primary" placeholder="https://...">
+                                </div>
+                                <div class="flex gap-3 pt-4">
+                                    <button onclick="saveContact()" class="flex-1 bg-primary text-white py-4 rounded-xl font-bold btn-interact shadow-lg shadow-orange-100">保存修改</button>
+                                    <button onclick="resetContactForm()" class="px-6 py-4 border border-gray-200 rounded-xl hover:bg-gray-50 font-bold transition-colors">重置</button>
+                                </div>
+                            </div>
+                            
+                            <!-- Presets -->
+                            <div class="mt-8 pt-8 border-t border-gray-50">
+                                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">快速填充预设</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <button onclick="fillContactPreset('wechat')" class="px-3 py-1.5 text-xs font-bold border border-green-100 bg-green-50 text-green-600 rounded-lg hover:bg-green-100 transition-colors">微信</button>
+                                    <button onclick="fillContactPreset('email')" class="px-3 py-1.5 text-xs font-bold border border-blue-100 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors">邮箱</button>
+                                    <button onclick="fillContactPreset('youtube')" class="px-3 py-1.5 text-xs font-bold border border-red-100 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors">YouTube</button>
+                                    <button onclick="fillContactPreset('douyin')" class="px-3 py-1.5 text-xs font-bold border border-gray-200 bg-gray-50 text-gray-800 rounded-lg hover:bg-gray-200 transition-colors">抖音</button>
+                                    <button onclick="fillContactPreset('kuaishou')" class="px-3 py-1.5 text-xs font-bold border border-orange-100 bg-orange-50 text-orange-600 rounded-lg hover:bg-orange-100 transition-colors">快手</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab: Settings -->
+                <div id="tab-settings" class="admin-tab-content hidden">
+                    <h2 class="text-3xl font-black text-gray-800 mb-8">网站设置</h2>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <!-- Shop Names Management -->
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                            <h3 class="font-black text-xl mb-6 text-primary flex items-center gap-2"><i class="fas fa-store"></i> 多语言店名管理</h3>
+                            <div class="space-y-5" id="lang-shop-names-list">
+                                <!-- Lang Inputs -->
+                                <div>
+                                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5">简体中文 (DEFAULT)</label>
+                                    <input type="text" data-lang="zh-CN" class="shop-name-input w-full border border-gray-200 rounded-xl px-4 py-2.5 focus-primary">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5">繁體中文</label>
+                                    <input type="text" data-lang="zh-TW" class="shop-name-input w-full border border-gray-200 rounded-xl px-4 py-2.5 focus-primary">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5">English</label>
+                                    <input type="text" data-lang="en-US" class="shop-name-input w-full border border-gray-200 rounded-xl px-4 py-2.5 focus-primary">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5">日本語</label>
+                                    <input type="text" data-lang="ja-JP" class="shop-name-input w-full border border-gray-200 rounded-xl px-4 py-2.5 focus-primary">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5">한국어</label>
+                                    <input type="text" data-lang="ko-KR" class="shop-name-input w-full border border-gray-200 rounded-xl px-4 py-2.5 focus-primary">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5">文言文</label>
+                                    <input type="text" data-lang="lzh" class="shop-name-input w-full border border-gray-200 rounded-xl px-4 py-2.5 focus-primary">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- General Settings -->
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                            <h3 class="font-black text-xl mb-6 text-primary flex items-center gap-2"><i class="fas fa-sliders-h"></i> 核心配置</h3>
+                            <div class="space-y-6">
+                                <div>
+                                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">网站通知栏 (留空隐藏)</label>
+                                    <textarea id="setting-notification" rows="2" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus-primary text-sm" placeholder="展示在首页顶部的滚动文字..."></textarea>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">默认展示语言</label>
+                                        <select id="setting-lang" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus-primary font-bold text-gray-700">
+                                            <option value="zh-CN">简体中文</option>
+                                            <option value="zh-TW">繁體中文</option>
+                                            <option value="en-US">English</option>
+                                            <option value="ja-JP">日本語</option>
+                                            <option value="ko-KR">한국어</option>
+                                            <option value="lzh">文言文</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">结算货币</label>
+                                        <select id="setting-currency" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus-primary font-bold text-gray-700">
+                                            <option value="CNY">中国 (CNY ¥)</option>
+                                            <option value="USD">USA (USD $)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                 <div>
+                                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">底部版权文字</label>
+                                    <input type="text" id="setting-copyright" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus-primary">
+                                </div>
+                                <div class="pt-6">
+                                    <button onclick="saveSettings()" class="w-full bg-primary text-white py-4 rounded-xl font-bold btn-interact shadow-lg shadow-orange-100">
+                                        <i class="fas fa-save mr-2"></i>保存全局配置
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab: Data Management (Export) -->
+                <div id="tab-data" class="admin-tab-content hidden">
+                    <h2 class="text-3xl font-black text-gray-800 mb-8">数据安全与导出</h2>
+                    <div class="bg-white p-12 rounded-3xl shadow-sm border border-gray-100 text-center max-w-2xl mx-auto">
+                        <div class="w-24 h-24 bg-orange-50 text-primary rounded-full flex items-center justify-center mx-auto mb-8 text-4xl shadow-inner">
+                            <i class="fas fa-cloud-download-alt"></i>
+                        </div>
+                        <h3 class="text-2xl font-black text-gray-800 mb-4">导出全量静态商城</h3>
+                        <p class="text-gray-400 mb-10 px-10 leading-relaxed text-sm">
+                            此操作会将您目前所有的<strong>商品数据、分类信息、联系方式、多语言店名、网站设置</strong>全部打包进一个新的 HTML 文件中。
+                            <br><br>
+                            <span class="bg-orange-50 text-primary px-3 py-1 rounded-full text-xs font-bold">无须数据库</span>
+                            <span class="bg-orange-50 text-primary px-3 py-1 rounded-full text-xs font-bold">离线运行</span>
+                            <span class="bg-orange-50 text-primary px-3 py-1 rounded-full text-xs font-bold">独立部署</span>
+                        </p>
+                        <button onclick="exportData()" class="bg-primary text-white text-lg px-12 py-5 rounded-2xl font-black btn-interact shadow-2xl shadow-orange-100 flex items-center gap-4 mx-auto hover:scale-105">
+                            <i class="fas fa-file-code"></i> 立即导出全数据 HTML
+                        </button>
+                        <p class="text-[10px] text-gray-300 mt-8 font-bold uppercase tracking-widest">ENCRYPTED DATA BUNDLING TECHNOLOGY</p>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+
+        <!-- === MODALS === -->
+
+        <!-- Product Details Modal (Frontend) -->
+        <div id="modal-product" class="hidden fixed inset-0 z-50 flex items-end md:items-center justify-center">
+            <div class="modal-overlay absolute inset-0" onclick="closeModal('product')"></div>
+            <div class="bg-white w-full md:w-[550px] md:rounded-3xl rounded-t-3xl shadow-2xl z-50 flex flex-col animate-zoom-in max-h-[90vh]">
+                <div class="p-5 border-b border-gray-50 flex justify-between items-center bg-white sticky top-0 rounded-t-3xl z-10">
+                    <h3 class="font-bold text-gray-800 tracking-tight text-sm">商品详情 / DETAILS</h3>
+                    <button onclick="closeModal('product')" class="w-8 h-8 flex items-center justify-center bg-gray-50 text-gray-400 hover:text-gray-800 rounded-full transition-colors"><i class="fas fa-times text-sm"></i></button>
+                </div>
+                <div class="overflow-y-auto custom-scroll p-4 md:p-6 flex-1">
+                    <!-- Image Carousel -->
+                    <div class="relative group mb-6">
+                        <div id="modal-carousel" class="flex overflow-x-auto snap-x custom-scroll scroll-smooth h-72 md:h-80 bg-gray-50 rounded-2xl border border-gray-100">
+                            <!-- Injected images -->
+                        </div>
+                        <div id="carousel-dots" class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 bg-black/10 px-3 py-1.5 rounded-full backdrop-blur-sm"></div>
+                    </div>
+
+                    <div class="mb-6">
+                        <div class="flex items-start justify-between gap-4 mb-2">
+                            <h2 id="modal-title" class="font-bold text-xl leading-tight text-gray-800"></h2>
+                        </div>
+                        <div class="flex items-end gap-3">
+                            <div class="flex flex-col">
+                                <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-0.5">现价 / NOW</span>
+                                <span class="text-primary font-bold text-3xl leading-none">¥<span id="modal-price"></span></span>
+                            </div>
+                            <div id="modal-original-price-container" class="flex flex-col mb-1 hidden">
+                                <span class="text-[10px] text-gray-300 font-bold uppercase tracking-wider mb-0.5">原价 / WAS</span>
+                                <span class="text-gray-300 font-bold text-base line-through decoration-gray-400/50">¥<span id="modal-original-price"></span></span>
+                            </div>
+                            <span id="modal-status-badge" class="ml-auto mb-1 inline-block px-3 py-1 text-[10px] rounded-full font-bold uppercase"></span>
+                        </div>
+                    </div>
+
+                    <!-- Specs Selectors -->
+                    <div id="modal-specs-container" class="space-y-6 mb-8">
+                        <div id="spec-sizes-box" class="hidden">
+                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">选择尺寸 / SIZE</p>
+                            <div id="spec-sizes-list" class="flex flex-wrap gap-2.5"></div>
+                        </div>
+                        <div id="spec-types-box" class="hidden">
+                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">选择类型 / TYPE</p>
+                            <div id="spec-types-list" class="flex flex-wrap gap-2.5"></div>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-50 p-5 rounded-2xl text-sm text-gray-500 mb-8 whitespace-pre-wrap leading-relaxed border border-gray-100 font-normal" id="modal-desc"></div>
+                    
+                    <div class="flex items-center justify-between p-5 bg-orange-50/50 rounded-2xl border border-orange-100 mb-6 shadow-sm">
+                        <div class="flex flex-col">
+                            <span class="font-bold text-xs text-orange-800 uppercase tracking-wider">购买数量</span>
+                            <span class="text-[10px] text-orange-400 font-bold uppercase tracking-tighter">SELECT QUANTITY</span>
+                        </div>
+                        <div class="flex items-center bg-white border border-orange-200 rounded-xl overflow-hidden shadow-inner">
+                            <button onclick="updateModalQty(-1)" class="w-10 h-10 hover:bg-orange-50 transition-colors text-primary font-bold text-xl flex items-center justify-center">-</button>
+                            <input type="number" id="modal-qty" value="1" min="1" max="10" class="w-12 text-center border-none focus:ring-0 p-0 text-lg font-bold text-gray-800 bg-transparent" readonly>
+                            <button onclick="updateModalQty(1)" class="w-10 h-10 hover:bg-orange-50 transition-colors text-primary font-bold text-xl flex items-center justify-center">+</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-5 border-t border-gray-50 bg-white rounded-b-3xl">
+                    <button onclick="addToCartFromModal()" class="w-full bg-primary text-white py-4 rounded-xl font-bold btn-interact shadow-lg shadow-orange-200 text-base tracking-tight uppercase">加入购物车 / ADD TO CART</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact/Settings Frontend Modal -->
+        <div id="modal-contact" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div class="modal-overlay absolute inset-0" onclick="closeModal('contact')"></div>
+            <div class="bg-white w-full max-w-[500px] rounded-3xl shadow-2xl z-50 flex flex-col animate-zoom-in max-h-[80vh]">
+                <div class="p-5 border-b border-gray-50 flex justify-between items-center bg-gray-50/30 rounded-t-3xl">
+                    <h3 class="font-bold text-gray-800 text-sm tracking-tight">店铺信息 / CONTACT</h3>
+                    <button onclick="closeModal('contact')" class="text-gray-400 hover:text-gray-800 transition-colors"><i class="fas fa-times text-lg"></i></button>
+                </div>
+                <div class="flex-1 overflow-y-auto custom-scroll p-6">
+                    <div class="mb-8">
+                        <h4 class="text-[10px] font-bold text-gray-400 mb-4 uppercase tracking-widest border-l-4 border-primary pl-2">官方联系方式</h4>
+                        <div id="frontend-contact-list" class="space-y-3 h-[280px] overflow-y-auto custom-scroll pr-2">
+                            <!-- Injected Contacts -->
+                        </div>
+                    </div>
+                    
+                    <div class="pt-6 border-t border-gray-50">
+                        <h4 class="text-[10px] font-bold text-gray-400 mb-4 uppercase tracking-widest border-l-4 border-gray-300 pl-2">店铺公示信息</h4>
+                        <div class="bg-gray-50/80 rounded-2xl p-5 space-y-3 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-gray-400 font-bold uppercase text-[10px]">店铺名称</span>
+                                <span class="font-semibold text-gray-700" id="info-shop-name"></span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400 font-bold uppercase text-[10px]">服务地区</span>
+                                <span class="font-semibold text-gray-700" id="info-region"></span>
+                            </div>
+                             <div class="flex justify-between">
+                                <span class="text-gray-400 font-bold uppercase text-[10px]">最后更新</span>
+                                <span class="font-semibold text-gray-700" id="info-date"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cart Modal -->
+        <div id="modal-cart" class="hidden fixed inset-0 z-50 flex justify-end">
+            <div class="modal-overlay absolute inset-0" onclick="closeModal('cart')"></div>
+            <div class="bg-white w-full md:w-[450px] h-full shadow-2xl z-50 flex flex-col animate-slide-in">
+                <div class="p-6 border-b border-gray-50 flex justify-between items-center bg-orange-50/50">
+                    <h3 class="font-bold text-lg flex items-center gap-2 text-primary">
+                        <i class="fas fa-shopping-cart"></i> 购物车 / CART
+                    </h3>
+                    <button onclick="closeModal('cart')" class="w-10 h-10 flex items-center justify-center bg-white text-gray-400 hover:text-gray-800 rounded-full shadow-sm transition-colors"><i class="fas fa-times"></i></button>
+                </div>
+                <div id="cart-items" class="flex-1 overflow-y-auto custom-scroll p-5 space-y-4">
+                    <!-- Cart items -->
+                    <div class="text-center text-gray-300 mt-32 flex flex-col items-center">
+                        <i class="fas fa-shopping-basket text-5xl mb-4 opacity-20"></i>
+                        <p class="font-bold uppercase tracking-wider text-xs">您的购物车空空如也</p>
+                    </div>
+                </div>
+                <div class="p-6 border-t border-gray-50 bg-white shadow-2xl">
+                    <div class="flex justify-between items-end mb-6 px-2">
+                        <span class="text-gray-400 font-bold uppercase text-xs tracking-wider">总金额 / TOTAL</span>
+                        <div class="text-right">
+                             <div id="cart-savings" class="text-[10px] text-green-500 font-bold mb-1"></div>
+                             <span class="text-2xl font-bold text-primary">¥<span id="cart-total">0.00</span></span>
+                        </div>
+                    </div>
+                    <button onclick="generateOrder()" class="w-full bg-primary text-white py-4 rounded-xl font-bold btn-interact shadow-lg shadow-orange-200 text-base tracking-tight uppercase">立即结算 / CHECKOUT</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Product Editor Modal -->
+        <div id="modal-product-editor" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div class="modal-overlay absolute inset-0" onclick="closeModal('product-editor')"></div>
+            <div class="bg-white w-full md:w-[850px] md:rounded-3xl rounded-2xl shadow-2xl z-50 p-6 md:p-10 max-h-[90vh] overflow-y-auto custom-scroll animate-zoom-in">
+                <div class="flex justify-between items-center mb-8">
+                    <div>
+                        <h3 class="font-bold text-2xl text-gray-800 tracking-tight">编辑商品详情</h3>
+                        <p class="text-gray-400 text-sm mt-1">请填写商品的核心数据与展示属性</p>
+                    </div>
+                    <button onclick="closeModal('product-editor')" class="w-10 h-10 flex items-center justify-center bg-gray-50 text-gray-400 hover:text-gray-800 rounded-full transition-colors"><i class="fas fa-times text-xl"></i></button>
+                </div>
+                <input type="hidden" id="edit-product-id">
+                <div class="space-y-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2.5">商品名称 / PRODUCT NAME</label>
+                            <input type="text" id="edit-name" class="w-full border border-gray-200 rounded-xl px-5 py-3 focus-primary font-semibold text-gray-700">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2.5">所属分类 / CATEGORY</label>
+                            <select id="edit-category" class="w-full border border-gray-200 rounded-xl px-5 py-3 focus-primary font-semibold text-gray-700">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2.5">当前售价 (¥)</label>
+                                <input type="number" id="edit-price" class="w-full border border-gray-200 rounded-xl px-5 py-3 focus-primary font-bold text-gray-800" step="0.01">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2.5">划线原价 (¥)</label>
+                                <input type="number" id="edit-original-price" class="w-full border border-gray-200 rounded-xl px-5 py-3 focus-primary font-gray-400 line-through" step="0.01">
+                            </div>
+                        </div>
+                         <div>
+                            <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2.5">库存销售状态 / STOCK</label>
+                            <select id="edit-stock-status" class="w-full border border-gray-200 rounded-xl px-5 py-3 focus-primary font-semibold text-gray-700">
+                                <option value="normal">✅ 正常现货 / NORMAL</option>
+                                <option value="out_stock">❌ 暂时缺货 / OUT OF STOCK</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2.5">商品图片 URLs (逗号分隔，最多25张)</label>
+                        <textarea id="edit-img" rows="3" class="w-full border border-gray-200 rounded-xl px-5 py-4 focus-primary text-xs leading-relaxed font-mono" placeholder="https://image1.jpg, https://image2.jpg..."></textarea>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2.5">尺寸规格 (用英文逗号分隔，例如: S,M,L)</label>
+                            <input type="text" id="edit-sizes" class="w-full border border-gray-200 rounded-xl px-5 py-3 focus-primary text-sm font-semibold" placeholder="S, M, L, XL">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2.5">类型/颜色 (用英文逗号分隔，例如: 红色,蓝色)</label>
+                            <input type="text" id="edit-types" class="w-full border border-gray-200 rounded-xl px-5 py-3 focus-primary text-sm font-semibold" placeholder="官方标配, 套餐一, 红色款">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2.5">详细介绍文字 (支持换行，最多2000字)</label>
+                        <textarea id="edit-desc" rows="6" class="w-full border border-gray-200 rounded-xl px-5 py-4 focus-primary text-sm leading-relaxed" maxlength="2000" placeholder="在此输入商品的详细描述信息..."></textarea>
+                    </div>
+                    
+                    <div class="border-2 border-orange-50 p-6 rounded-3xl bg-orange-50/20">
+                        <label class="block text-[10px] font-bold text-orange-500 uppercase tracking-wider mb-4">Marketing Discount Settings / 营销折扣设置</label>
+                        <div class="flex flex-wrap gap-8 text-sm font-semibold">
+                            <label class="flex items-center gap-3 cursor-pointer group">
+                                <input type="radio" name="discount-type" value="none" checked onclick="toggleDiscountInput()" class="w-5 h-5 text-primary border-gray-300 focus:ring-primary"> 
+                                <span class="group-hover:text-primary transition-colors uppercase tracking-tight">无折扣 / NONE</span>
+                            </label>
+                            <label class="flex items-center gap-3 cursor-pointer group">
+                                <input type="radio" name="discount-type" value="percent" onclick="toggleDiscountInput()" class="w-5 h-5 text-primary border-gray-300 focus:ring-primary">
+                                <span class="group-hover:text-primary transition-colors uppercase tracking-tight">折扣率 / OFF %</span>
+                            </label>
+                            <label class="flex items-center gap-3 cursor-pointer group">
+                                <input type="radio" name="discount-type" value="minus" onclick="toggleDiscountInput()" class="w-5 h-5 text-primary border-gray-300 focus:ring-primary">
+                                <span class="group-hover:text-primary transition-colors uppercase tracking-tight">立减金额 / MINUS ¥</span>
+                            </label>
+                        </div>
+                        <input type="number" id="edit-discount-val" class="mt-6 w-full border border-gray-200 rounded-2xl px-5 py-3 hidden focus-primary font-bold text-gray-800" placeholder="在此输入数值 (例如: 10 代表 10% 或 10元)">
+                    </div>
+
+                    <div class="flex justify-end gap-4 pt-8 border-t border-gray-100">
+                        <button onclick="closeModal('product-editor')" class="px-8 py-3 text-gray-400 hover:text-gray-800 font-bold uppercase text-xs tracking-wider transition-colors">取消 / CANCEL</button>
+                        <button onclick="saveProduct()" class="px-10 py-3 bg-primary text-white rounded-xl font-bold btn-interact shadow-lg shadow-orange-100 text-base">保存商品 / SAVE</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        
+        <!-- Loading/Success/Receipt Modal -->
+        <div id="modal-loading" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+            <div class="bg-white p-8 rounded-3xl shadow-2xl flex flex-col items-center animate-zoom-in w-full max-w-md text-center border border-gray-100">
+                <div id="loading-spinner" class="w-16 h-16 border-4 border-orange-100 border-t-primary rounded-full animate-spin mb-6"></div>
+                <div id="success-icon" class="hidden w-20 h-20 bg-green-50 text-green-500 rounded-full flex items-center justify-center mb-6 text-4xl shadow-inner border border-green-100"><i class="fas fa-check"></i></div>
+                
+                <h3 id="loading-title" class="font-black text-2xl mb-3 text-gray-800 tracking-tight">正在处理</h3>
+                <div id="loading-text" class="text-sm text-gray-500 mb-8 leading-relaxed font-medium">请稍候...</div>
+                <button id="loading-close-btn" onclick="closeModal('loading')" class="hidden bg-primary text-white w-full py-4 rounded-2xl text-sm font-black btn-interact shadow-xl shadow-orange-100 uppercase tracking-widest">确认 / CONFIRM</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // --- DATA STORE ---
+        const defaultContacts = [
+            { id: 1, platform: '微信', icon: 'fab fa-weixin', color: '#07c160', content: 'HIGER_BUS', link: '' },
+            { id: 2, platform: '邮箱', icon: 'fas fa-envelope', color: '#3b82f6', content: 'china.aviation.caac@gmail.com', link: 'mailto:china.aviation.caac@gmail.com' },
+            { id: 3, platform: 'YouTube', icon: 'fab fa-youtube', color: '#ff0000', content: '云端机库 CN', link: 'https://youtube.com' },
+            { id: 4, platform: '抖音', icon: 'fab fa-tiktok', color: '#000000', content: '云端机库 CN', link: '' },
+            { id: 5, platform: '快手', icon: 'fas fa-video', color: '#f97316', content: '云端机库 CN', link: '' }
+        ];
+
+        let appData = {
+            shopName: "云端商城",
+            shopNames: {
+                'zh-CN': '云端商城',
+                'zh-TW': '雲端商城',
+                'en-US': 'Cloud Mart',
+                'ja-JP': 'クラウドモール',
+                'ko-KR': '클라우드 몰',
+                'lzh': '雲端肆'
+            },
+            categories: [], 
+            products: [],   
+            contacts: JSON.parse(JSON.stringify(defaultContacts)),
+            settings: {
+                currency: 'CNY',
+                lang: 'zh-CN',
+                notification: '🔥 欢迎光临云端商城！全场商品限时特惠，新店开业优惠多多！点击购物车查看惊喜！🔥',
+                copyright: '© 2023 云端商城 All Rights Reserved.',
+                updatedAt: new Date().toLocaleDateString()
+            }
+        };
+
+        let cart = [];
+        let currentModalProduct = null;
+        let selectedCategoryId = 'all';
+        let gearClickCount = 0;
+        let gearTimer = null;
+        let altTCount = 0;
+
+        // --- KEYBOARD SHORTCUT (ALT+T x5) ---
+        window.addEventListener('keydown', (e) => {
+            if (e.altKey && (e.key === 't' || e.key === 'T')) {
+                e.preventDefault();
+                altTCount++;
+                if (altTCount >= 5) {
+                    altTCount = 0;
+                    checkAdmin();
+                }
+            }
+        });
+
+        // --- INITIALIZATION ---
+        function init() {
+            if (window.EXPORTED_DATA) {
+                appData = window.EXPORTED_DATA;
+            } else {
+                const stored = localStorage.getItem('pdd_shop_data_v3');
+                if (stored) {
+                    const parsed = JSON.parse(stored);
+                    appData = {...appData, ...parsed};
+                }
+            }
+            
+            // Set current display name
+            appData.shopName = appData.shopNames[appData.settings.lang] || appData.shopNames['zh-CN'] || "云端商城";
+
+            renderFrontend();
+            updateCartCount();
+        }
+
+        function saveData() {
+            localStorage.setItem('pdd_shop_data_v3', JSON.stringify(appData));
+            renderFrontend();
+        }
+
+        // --- GEAR CLICK LOGIC (20 clicks = Admin) ---
+        function handleGearClick() {
+            gearClickCount++;
+            clearTimeout(gearTimer);
+            
+            if (gearClickCount >= 20) {
+                gearClickCount = 0;
+                checkAdmin();
+            } else {
+                gearTimer = setTimeout(() => {
+                    if (gearClickCount < 20 && gearClickCount > 0) {
+                        openContactModal(); 
+                    }
+                    gearClickCount = 0;
+                }, 400); // 400ms window between clicks
+            }
+        }
+
+        // --- FRONTEND RENDERING ---
+        function renderFrontend() {
+            document.getElementById('shop-name-display').innerText = appData.shopName;
+            
+            const notifBar = document.getElementById('notification-bar');
+            const notifText = document.getElementById('notification-text');
+            if (appData.settings.notification) {
+                const text = appData.settings.notification;
+                // Repeat text at least 20 times to ensure it covers all screen widths and loops perfectly
+                const item = `<span class="marquee-item flex items-center h-full px-6 text-sm font-medium">${text}</span><span class="text-orange-200 opacity-60">✦</span>`;
+                notifText.innerHTML = item.repeat(20); 
+                notifBar.classList.remove('hidden');
+            } else {
+                notifBar.classList.add('hidden');
+            }
+
+            // Categories Sidebar
+            const catSidebar = document.getElementById('category-sidebar');
+            const catItems = [{id: 'all', name: '全部商品'}, ...appData.categories];
+            catSidebar.innerHTML = catItems.map(cat => `
+                <button onclick="selectCategory('${cat.id}')" class="w-full text-left px-4 py-2 rounded-xl text-xs font-semibold transition-all ${selectedCategoryId == cat.id ? 'bg-primary text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'}">
+                    ${cat.name}
+                </button>
+            `).join('');
+
+            // Product List
+            const listEl = document.getElementById('product-list');
+            let displayProducts = appData.products.filter(p => p.onShelf);
+            if (selectedCategoryId !== 'all') {
+                displayProducts = displayProducts.filter(p => p.categoryId == selectedCategoryId);
+            }
+
+            if (displayProducts.length === 0) {
+                listEl.innerHTML = `
+                    <div class="col-span-full text-center py-32 text-gray-400 animate-fade-in">
+                        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-box-open text-2xl text-gray-300"></i>
+                        </div>
+                        <p class="font-bold text-sm">没有找到商品 / NO PRODUCTS</p>
+                    </div>`;
+            } else {
+                listEl.innerHTML = displayProducts.map(p => {
+                    const isOut = p.stockStatus === 'out_stock';
+                    const mainImg = p.img ? p.img.split(',')[0].trim() : '';
+                    return `
+                    <div onclick="clickProduct(${p.id})" class="bg-white rounded-2xl shadow-sm overflow-hidden pb-3 cursor-pointer hover:shadow-xl hover:-translate-y-1 transition-all duration-300 animate-fade-in border border-gray-50 relative group">
+                        <div class="aspect-square bg-gray-50 relative overflow-hidden">
+                            ${mainImg ? `<img src="${mainImg}" onerror="this.src='https://placehold.co/400x400?text=Image+Error'; this.onerror=null;" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 ${isOut ? 'grayscale-[0.5]' : ''}">` : `<div class="w-full h-full flex items-center justify-center text-gray-200"><i class="fas fa-image text-2xl"></i></div>`}
+                            ${isOut ? '<div class="absolute inset-0 bg-black/10 backdrop-blur-[0.5px] flex items-center justify-center"><span class="bg-black/70 text-white px-3 py-1 text-[9px] rounded-full font-bold uppercase tracking-wider scale-90">SOLD OUT</span></div>' : ''}
+                        </div>
+                        <div class="p-3">
+                            <h3 class="text-xs font-semibold line-clamp-2 h-8 mb-2 text-gray-800 leading-snug group-hover:text-primary transition-colors">${p.name}</h3>
+                            <div class="flex items-center justify-between mt-2">
+                                <div class="flex items-baseline gap-1">
+                                    <span class="text-primary font-bold text-lg">¥${p.price}</span>
+                                    ${p.originalPrice ? `<span class="text-[9px] text-gray-300 line-through decoration-gray-300/40">¥${p.originalPrice}</span>` : ''}
+                                </div>
+                                <span class="text-[8px] px-1.5 py-0.5 rounded-full font-bold uppercase tracking-tight ${isOut ? 'bg-red-50 text-red-400' : 'bg-green-50 text-green-500'}">${isOut ? '缺货' : '现货'}</span>
+                            </div>
+                        </div>
+                    </div>`;
+                }).join('');
+            }
+        }
+
+        function selectCategory(id) {
+            selectedCategoryId = id;
+            renderFrontend();
+        }
+
+        // --- PRODUCT ACTIONS (MODAL) ---
+        function clickProduct(id) {
+            const product = appData.products.find(p => p.id === id);
+            if (!product) return;
+
+            currentModalProduct = product;
+            
+            // Carousel Images (limit 25)
+            const images = product.img ? product.img.split(',').map(s => s.trim()).filter(s => s !== '').slice(0, 25) : [];
+            const carouselEl = document.getElementById('modal-carousel');
+            const dotsEl = document.getElementById('carousel-dots');
+            
+            if (images.length === 0) {
+                carouselEl.innerHTML = '<div class="w-full h-full flex items-center justify-center text-gray-200 snap-center"><i class="fas fa-image text-8xl"></i></div>';
+                dotsEl.innerHTML = '';
+            } else {
+                carouselEl.innerHTML = images.map(url => `
+                    <div class="min-w-full h-full snap-center flex items-center justify-center bg-white">
+                        <img src="${url}" onerror="this.src='https://placehold.co/600x400?text=Invalid+Image+URL'; this.onerror=null;" class="max-w-full max-h-full object-contain">
+                    </div>
+                `).join('');
+                dotsEl.innerHTML = images.map((_, i) => `<div class="w-1.5 h-1.5 rounded-full transition-all duration-300 ${i===0?'bg-primary w-4 shadow-sm':'bg-gray-300'}"></div>`).join('');
+                
+                carouselEl.scrollLeft = 0;
+                carouselEl.onscroll = () => {
+                    const idx = Math.round(carouselEl.scrollLeft / carouselEl.clientWidth);
+                    Array.from(dotsEl.children).forEach((dot, i) => {
+                        const active = i === idx;
+                        dot.className = `w-1.5 h-1.5 rounded-full transition-all duration-300 ${active ? 'bg-primary w-4 shadow-sm' : 'bg-gray-300'}`;
+                    });
+                };
+            }
+
+            document.getElementById('modal-title').innerText = product.name;
+            document.getElementById('modal-price').innerText = product.price;
+            
+            const origPriceEl = document.getElementById('modal-original-price');
+            const origPriceContainer = document.getElementById('modal-original-price-container');
+            if (product.originalPrice) {
+                origPriceEl.innerText = product.originalPrice;
+                origPriceContainer.classList.remove('hidden');
+            } else {
+                origPriceContainer.classList.add('hidden');
+            }
+
+            document.getElementById('modal-desc').innerText = product.desc || '此商品暂无详细介绍。';
+            document.getElementById('modal-qty').value = 1;
+            
+            // Render Specifications
+            renderSpecTags('spec-sizes', product.sizes);
+            renderSpecTags('spec-types', product.types);
+
+            const badgeEl = document.getElementById('modal-status-badge');
+            const btnEl = document.querySelector('#modal-product button[onclick="addToCartFromModal()"]');
+            
+            if (product.stockStatus === 'out_stock') {
+                badgeEl.innerText = "暂时缺货";
+                badgeEl.className = "inline-block px-3 py-1 text-[10px] rounded-full font-black tracking-widest uppercase bg-red-50 text-red-400 border border-red-100";
+                btnEl.innerText = "暂时缺货 / OUT OF STOCK";
+                btnEl.disabled = true;
+                btnEl.classList.add('opacity-50', 'cursor-not-allowed', 'grayscale');
+            } else {
+                badgeEl.innerText = "现货发售中";
+                badgeEl.className = "inline-block px-3 py-1 text-[10px] rounded-full font-black tracking-widest uppercase bg-green-50 text-green-500 border border-green-100";
+                btnEl.innerText = "加入购物车 / ADD TO CART";
+                btnEl.disabled = false;
+                btnEl.classList.remove('opacity-50', 'cursor-not-allowed', 'grayscale');
+            }
+
+            openModal('product');
+        }
+
+        function renderSpecTags(idPrefix, specString) {
+            const container = document.getElementById(`${idPrefix}-box`);
+            const list = document.getElementById(`${idPrefix}-list`);
+            const specs = specString ? specString.split(',').map(s => s.trim()).filter(s => s !== '') : [];
+            
+            if (specs.length > 0) {
+                container.classList.remove('hidden');
+                list.innerHTML = specs.map((s, i) => `
+                    <button onclick="selectSpec('${idPrefix}', ${i})" class="${idPrefix}-btn px-4 py-2 border-2 rounded-xl text-xs font-black transition-all hover:border-primary/50 ${i === 0 ? 'bg-orange-50 border-primary text-primary shadow-sm is-active-spec' : 'bg-white border-gray-100 text-gray-400'}">
+                        ${s}
+                    </button>
+                `).join('');
+            } else {
+                container.classList.add('hidden');
+            }
+        }
+
+        function selectSpec(prefix, idx) {
+            const btns = document.querySelectorAll(`.${prefix}-btn`);
+            btns.forEach((btn, i) => {
+                const isActive = i === idx;
+                // Use a more robust check for finding the active button later
+                if (isActive) {
+                    btn.classList.add('bg-orange-50', 'border-primary', 'text-primary', 'shadow-sm', 'is-active-spec');
+                    btn.classList.remove('bg-white', 'border-gray-100', 'text-gray-400');
+                } else {
+                    btn.classList.remove('bg-orange-50', 'border-primary', 'text-primary', 'shadow-sm', 'is-active-spec');
+                    btn.classList.add('bg-white', 'border-gray-100', 'text-gray-400');
+                }
+            });
+        }
+
+        function updateModalQty(change) {
+            const input = document.getElementById('modal-qty');
+            let val = parseInt(input.value) + change;
+            if (val < 1) val = 1;
+            if (val > 10) val = 10;
+            input.value = val;
+        }
+
+        function addToCartFromModal() {
+            if (!currentModalProduct) return;
+            const qtyInput = document.getElementById('modal-qty');
+            const qty = parseInt(qtyInput.value) || 1;
+            
+            // Collect selections using the custom marker class
+            const sizeBtn = document.querySelector('.spec-sizes-btn.is-active-spec');
+            const typeBtn = document.querySelector('.spec-types-btn.is-active-spec');
+            
+            // If none manually selected, try to find the one that was initialized with border-primary
+            const finalSize = sizeBtn ? sizeBtn.innerText : (document.querySelector('.spec-sizes-btn.border-primary')?.innerText || '');
+            const finalType = typeBtn ? typeBtn.innerText : (document.querySelector('.spec-types-btn.border-primary')?.innerText || '');
+            
+            const specsLabel = [finalSize, finalType].filter(Boolean).join(' / ') || '默认规格';
+
+            const cartKey = `${currentModalProduct.id}-${specsLabel}`;
+            const existing = cart.find(c => c.cartKey === cartKey);
+            
+            if (existing) {
+                // Remove the "existing.qty + qty > 10" restriction to allow cumulative totals > 10
+                // but each single "Add" is still limited by the modal UI (1-10)
+                existing.qty += qty;
+            } else {
+                cart.push({
+                    cartKey: cartKey,
+                    productId: currentModalProduct.id,
+                    name: currentModalProduct.name,
+                    price: currentModalProduct.price,
+                    img: currentModalProduct.img ? currentModalProduct.img.split(',')[0].trim() : '',
+                    qty: qty,
+                    specs: specsLabel,
+                    discountType: currentModalProduct.discountType,
+                    discountVal: currentModalProduct.discountVal
+                });
+            }
+            
+            updateCartCount();
+            closeModal('product');
+            showToast("成功加入购物车", "success");
+        }
+
+        // --- CART UI ---
+        function updateCartCount() {
+            const count = cart.reduce((acc, item) => acc + item.qty, 0);
+            const el = document.getElementById('cart-count');
+            el.innerText = count;
+            el.classList.toggle('hidden', count === 0);
+        }
+
+        function updateCartQty(idx, change) {
+            if (cart[idx]) {
+                cart[idx].qty += change;
+                if (cart[idx].qty < 1) {
+                    removeFromCart(idx);
+                } else {
+                    renderCartItems();
+                }
+                updateCartCount();
+            }
+        }
+
+        function renderCartItems() {
+            const container = document.getElementById('cart-items');
+            const totalEl = document.getElementById('cart-total');
+            const savingsEl = document.getElementById('cart-savings');
+
+            if (cart.length === 0) {
+                container.innerHTML = `<div class="text-center text-gray-300 mt-32 flex flex-col items-center">
+                    <i class="fas fa-shopping-basket text-6xl mb-4 opacity-20"></i>
+                    <p class="font-black uppercase tracking-widest text-xs">您的购物车空空如也</p>
+                </div>`;
+                totalEl.innerText = '0.00';
+                savingsEl.innerText = '';
+            } else {
+                let total = 0;
+                let savings = 0;
+                container.innerHTML = cart.map((item, idx) => {
+                    let original = parseFloat(item.price);
+                    let final = original;
+                    let discTag = '';
+
+                    if (item.discountType === 'percent' && item.discountVal > 0) {
+                        final = original * (1 - item.discountVal / 100);
+                        discTag = `<span class="bg-red-50 text-red-500 px-1.5 py-0.5 rounded text-[9px] font-black italic">-${item.discountVal}%</span>`;
+                    } else if (item.discountType === 'minus' && item.discountVal > 0) {
+                        final = original - item.discountVal;
+                        discTag = `<span class="bg-red-50 text-red-500 px-1.5 py-0.5 rounded text-[9px] font-black italic">-¥${item.discountVal}</span>`;
+                    }
+                    if (final < 0) final = 0;
+
+                    total += final * item.qty;
+                    savings += (original - final) * item.qty;
+
+                    return `
+                    <div class="flex gap-4 bg-gray-50/50 p-4 rounded-2xl border border-gray-100/50 animate-fade-in">
+                        <img src="${item.img || ''}" class="w-16 h-16 object-cover rounded-xl bg-white shadow-sm border border-gray-100">
+                        <div class="flex-1 min-w-0">
+                            <div class="text-xs font-black text-gray-800 truncate mb-1">${item.name}</div>
+                            <div class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2">${item.specs}</div>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <div class="text-primary font-black">¥${final.toFixed(2)}</div>
+                                    ${discTag}
+                                </div>
+                                <div class="flex items-center bg-white border border-gray-100 rounded-lg overflow-hidden shadow-sm scale-90 origin-right">
+                                    <button onclick="updateCartQty(${idx}, -1)" class="w-7 h-7 hover:bg-gray-50 text-gray-400 font-black">-</button>
+                                    <span class="w-8 text-center text-xs font-black text-gray-700">${item.qty}</span>
+                                    <button onclick="updateCartQty(${idx}, 1)" class="w-7 h-7 hover:bg-gray-50 text-gray-400 font-black">+</button>
+                                </div>
+                            </div>
+                        </div>
+                        <button onclick="removeFromCart(${idx})" class="text-gray-200 hover:text-red-400 transition-colors self-start pt-1"><i class="fas fa-times-circle"></i></button>
+                    </div>`;
+                }).join('');
+                
+                totalEl.innerText = total.toFixed(2);
+                savingsEl.innerText = savings > 0 ? `已为您节省 ¥${savings.toFixed(2)}` : '';
+            }
+        }
+
+        function openCart() {
+            renderCartItems();
+            openModal('cart');
+        }
+
+        function downloadReceipt(orderId) {
+            const date = new Date().toLocaleString();
+            let text = `==============================\n`;
+            text += `   ${appData.shopName.toUpperCase()} - OFFICIAL RECEIPT\n`;
+            text += `==============================\n`;
+            text += `ORDER ID: ${orderId}\n`;
+            text += `DATE    : ${date}\n`;
+            text += `------------------------------\n`;
+
+            let total = 0;
+            let totalOriginal = 0;
+
+            if (window.lastOrderData && window.lastOrderData.items) {
+                window.lastOrderData.items.forEach(item => {
+                    text += `ITEM : ${item.name}\n`;
+                    text += `SPEC : ${item.specs}\n`;
+                    text += `QTY  : ${item.qty}\n`;
+                    text += `PRICE: ¥${item.subtotal.toFixed(2)}\n`;
+                    text += `------------------------------\n`;
+                    total += item.subtotal;
+                    totalOriginal += (item.subtotal + item.savings);
+                });
+            }
+
+            text += `SUBTOTAL : ¥${totalOriginal.toFixed(2)}\n`;
+            text += `DISCOUNT : -¥${(totalOriginal - total).toFixed(2)}\n`;
+            text += `TOTAL    : ¥${total.toFixed(2)}\n`;
+            text += `==============================\n`;
+            text += `PLEASE SEND THIS TO ADMIN FOR PAYMENT\n`;
+            text += `THANK YOU FOR SHOPPING WITH US!\n`;
+            text += `==============================\n`;
+
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Receipt_${orderId}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function removeFromCart(idx) {
+            cart.splice(idx, 1);
+            updateCartCount();
+            renderCartItems();
+        }
+
+        function generateOrder() {
+            if (cart.length === 0) return;
+            
+            let total = 0;
+            let totalSavings = 0;
+            const orderId = Date.now().toString().slice(-8);
+
+            // Store data for the downloadReceipt function
+            window.lastOrderData = {
+                items: cart.map(item => {
+                    let original = parseFloat(item.price);
+                    let final = original;
+                    if (item.discountType === 'percent' && item.discountVal > 0) final = original * (1 - item.discountVal / 100);
+                    else if (item.discountType === 'minus' && item.discountVal > 0) final = original - item.discountVal;
+                    if (final < 0) final = 0;
+                    
+                    const p = appData.products.find(x => x.id === item.productId);
+                    const refPrice = (p && p.originalPrice) ? p.originalPrice : original;
+
+                    return {
+                        name: item.name,
+                        specs: item.specs,
+                        qty: item.qty,
+                        subtotal: final * item.qty,
+                        savings: Math.max(0, (refPrice - final) * item.qty)
+                    };
+                })
+            };
+
+            let itemsHTML = cart.map(item => {
+                let original = parseFloat(item.price);
+                let final = original;
+                let discStr = 'NORMAL';
+
+                if (item.discountType === 'percent' && item.discountVal > 0) {
+                    final = original * (1 - item.discountVal / 100);
+                    discStr = `-${item.discountVal}% OFF`;
+                } else if (item.discountType === 'minus' && item.discountVal > 0) {
+                    final = original - item.discountVal;
+                    discStr = `MINUS ¥${item.discountVal}`;
+                }
+                if (final < 0) final = 0;
+
+                const subtotal = final * item.qty;
+                total += subtotal;
+                
+                const p = appData.products.find(x => x.id === item.productId);
+                const hasOriginalPrice = p && p.originalPrice;
+                const referencePrice = hasOriginalPrice ? p.originalPrice : original;
+                const itemSavings = (referencePrice - final) * item.qty;
+                totalSavings += Math.max(0, itemSavings);
+
+                return `
+                    <div class="flex justify-between items-start border-b border-dashed border-gray-100 pb-3 mb-3">
+                        <div class="flex-1 pr-4">
+                            <div class="font-black text-gray-800 text-xs">${item.name}</div>
+                            <div class="text-[9px] text-gray-400 mt-1 uppercase tracking-tighter">${item.specs} x ${item.qty}</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="font-black text-gray-900 text-xs">¥${subtotal.toFixed(2)}</div>
+                            <div class="flex flex-col items-end">
+                                <div class="text-[8px] text-red-400 font-bold uppercase tracking-tight">${discStr}</div>
+                                ${hasOriginalPrice && itemSavings > 0 ? `<div class="text-[7px] text-gray-300 line-through italic">WAS ¥${(referencePrice * item.qty).toFixed(2)}</div>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            let receiptHTML = `
+                <div class="receipt-box p-6 font-mono bg-white border border-gray-100 shadow-inner rounded-3xl text-left">
+                    <div class="text-center mb-6 border-b-4 border-double border-gray-100 pb-4">
+                        <h2 class="text-lg font-black uppercase tracking-[0.3em] text-gray-800">Shop Receipt</h2>
+                        <div class="text-[9px] text-gray-400 mt-2 font-bold">INV: ${orderId} | ${new Date().toLocaleString()}</div>
+                    </div>
+                    <div class="mb-6">
+                        ${itemsHTML}
+                    </div>
+                    <div class="space-y-2 mb-8">
+                        <div class="flex justify-between text-[10px] text-gray-400 font-bold"><span>原价小计 / SUB</span><span>¥${(total + totalSavings).toFixed(2)}</span></div>
+                        <div class="flex justify-between text-[10px] text-green-500 font-bold"><span>优惠金额 / SAVINGS</span><span>-¥${totalSavings.toFixed(2)}</span></div>
+                        <div class="flex justify-between text-xl font-black text-primary mt-4 pt-4 border-t-2 border-dashed border-gray-100">
+                            <span>应付总额 / TOTAL</span><span>¥${total.toFixed(2)}</span>
+                        </div>
+                    </div>
+                    <div class="bg-orange-50 p-5 rounded-2xl border border-orange-100 text-center">
+                        <p class="text-[10px] font-black text-orange-600 mb-4 leading-relaxed uppercase tracking-widest">
+                            <i class="fas fa-check-circle mr-1"></i> 订单已锁定 / ORDER LOCKED
+                        </p>
+                        <p class="text-[9px] text-orange-500 mb-6 font-bold">请下载收据或截图发送给管理员进行核销支付</p>
+                        <div class="flex flex-col gap-2">
+                            <button onclick="downloadReceipt('${orderId}')" class="w-full bg-white text-primary border border-primary text-[10px] font-black py-3 rounded-xl shadow-sm hover:bg-orange-50 transition-colors flex items-center justify-center gap-2">
+                                <i class="fas fa-file-download"></i> 下载电子收据 / DOWNLOAD
+                            </button>
+                            <button onclick="closeModal('loading'); openContactModal();" class="w-full bg-primary text-white text-[10px] font-black py-3 rounded-xl shadow-lg shadow-orange-200 transition-transform active:scale-95 flex items-center justify-center gap-2">
+                                <i class="fas fa-headset"></i> 联系管理员 / CONTACT
+                            </button>
+                        </div>
+                    </div>
+                </div>`;
+
+            const loadingModal = document.getElementById('modal-loading');
+            document.getElementById('loading-spinner').classList.add('hidden');
+            document.getElementById('success-icon').classList.add('hidden');
+            document.getElementById('loading-title').innerText = "结算成功 / SUCCESS";
+            document.getElementById('loading-text').innerHTML = receiptHTML;
+            document.getElementById('loading-close-btn').classList.remove('hidden');
+            
+            openModal('loading');
+            
+            cart = [];
+            updateCartCount();
+            closeModal('cart');
+        }
+
+        // --- CONTACT MODAL ---
+        function openContactModal() {
+            const listEl = document.getElementById('frontend-contact-list');
+            listEl.innerHTML = appData.contacts.map(c => `
+                <a href="${c.link || 'javascript:void(0)'}" target="${c.link ? '_blank' : ''}" class="flex items-center gap-4 p-4 bg-gray-50/80 rounded-2xl hover:bg-orange-50 hover:shadow-md transition-all group">
+                    <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-sm transition-transform group-hover:scale-110" style="background-color: ${c.color}">
+                        <i class="${c.icon}"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1 opacity-70">${c.platform}</div>
+                        <div class="font-black text-gray-800 truncate text-sm">${c.content}</div>
+                    </div>
+                    ${c.link ? '<i class="fas fa-chevron-right text-[10px] text-gray-300 group-hover:text-primary transition-colors"></i>' : ''}
+                </a>
+            `).join('');
+
+            document.getElementById('info-shop-name').innerText = appData.shopName;
+            document.getElementById('info-region').innerText = appData.settings.currency === 'CNY' ? '中国大陆 / MAINLAND CHINA' : '全球 / GLOBAL';
+            document.getElementById('info-date').innerText = appData.settings.updatedAt;
+
+            openModal('contact');
+        }
+
+        // --- ADMIN: LOGIN & ACCESS ---
+        function checkAdmin() {
+            document.getElementById('view-admin-login').classList.remove('hidden');
+        }
+
+        function loginAdmin() {
+            const pwd = document.getElementById('admin-password').value;
+            if (pwd === 'Carter0502') {
+                document.getElementById('view-admin-login').classList.add('hidden');
+                document.getElementById('view-frontend').classList.add('hidden');
+                document.getElementById('view-admin-dashboard').classList.remove('hidden');
+                switchAdminTab('products');
+                showToast('欢迎回来，管理员', 'success');
+                document.getElementById('admin-password').value = '';
+            } else {
+                showToast('访问密码验证失败', 'error');
+            }
+        }
+
+        function logoutAdmin() {
+            document.getElementById('view-admin-dashboard').classList.add('hidden');
+            document.getElementById('view-frontend').classList.remove('hidden');
+        }
+
+        function switchAdminTab(tabName) {
+            document.querySelectorAll('.admin-tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+            
+            document.querySelectorAll('.admin-nav-btn').forEach(btn => {
+                const isActive = btn.getAttribute('data-tab') === tabName;
+                btn.className = `admin-nav-btn w-full text-left px-4 py-3.5 rounded-xl flex items-center gap-3 transition-all ${isActive ? 'bg-orange-50 text-primary font-black shadow-sm' : 'text-gray-500 hover:bg-gray-50'}`;
+            });
+
+            if (tabName === 'products') renderAdminProducts();
+            if (tabName === 'categories') renderAdminCategories();
+            if (tabName === 'contacts') renderAdminContacts();
+            if (tabName === 'settings') loadSettingsToForm();
+        }
+
+        // --- ADMIN: PRODUCTS MGMT ---
+        function renderAdminProducts() {
+            const tbody = document.getElementById('admin-product-list');
+            tbody.innerHTML = appData.products.map(p => {
+                const isOut = p.stockStatus === 'out_stock';
+                const onShelf = p.onShelf;
+                const category = appData.categories.find(c => c.id == p.categoryId)?.name || '未分类';
+                const mainImg = p.img ? p.img.split(',')[0].trim() : '';
+                return `
+                <tr class="hover:bg-gray-50/50 transition-colors group">
+                    <td class="p-5"><input type="checkbox" class="product-select rounded text-primary focus:ring-primary" value="${p.id}"></td>
+                    <td class="p-5">
+                        <div class="w-10 h-10 bg-gray-100 rounded-lg overflow-hidden border border-gray-100 group-hover:scale-110 transition-transform">
+                             ${mainImg ? `<img src="${mainImg}" onerror="this.src='https://placehold.co/100x100?text=Error'; this.onerror=null;" class="w-full h-full object-cover">` : '<i class="fas fa-image text-gray-300 w-full h-full flex items-center justify-center text-xs"></i>'}
+                        </div>
+                    </td>
+                    <td class="p-5">
+                        <div class="text-[9px] text-gray-400 font-bold uppercase tracking-wider mb-0.5">${category}</div>
+                        <div class="font-bold text-gray-800 line-clamp-1">${p.name}</div>
+                    </td>
+                    <td class="p-5">
+                        <div class="font-bold text-gray-800">¥${p.price}</div>
+                        ${p.originalPrice ? `<div class="text-[10px] text-gray-300 line-through">¥${p.originalPrice}</div>` : ''}
+                    </td>
+                    <td class="p-5">
+                        <div class="flex flex-col gap-1">
+                            <span class="${onShelf ? 'text-green-600 bg-green-50 border-green-100' : 'text-gray-400 bg-gray-50 border-gray-100'} px-2 py-0.5 rounded text-[8px] font-bold border uppercase tracking-wider inline-block w-fit">${onShelf ? '已上架' : '已下架'}</span>
+                            <span class="${!isOut ? 'text-blue-600 bg-blue-50 border-blue-100' : 'text-red-600 bg-red-50 border-red-100'} px-2 py-0.5 rounded text-[8px] font-bold border uppercase tracking-wider inline-block w-fit">${!isOut ? '现货' : '缺货'}</span>
+                        </div>
+                    </td>
+                    <td class="p-5 text-right space-x-1 whitespace-nowrap">
+                        <button onclick="editProduct(${p.id})" class="text-blue-500 hover:bg-blue-50 p-2 rounded-lg transition-colors"><i class="fas fa-edit"></i></button>
+                        <button onclick="toggleProductStock(${p.id})" class="p-2 border border-gray-200 rounded-lg text-[9px] font-bold ${isOut ? 'text-green-600 bg-green-50' : 'text-red-400 bg-red-50'} hover:opacity-80 transition-all">
+                            ${isOut ? '设为正常' : '设为缺货'}
+                        </button>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        function openProductEditor() {
+            document.getElementById('edit-product-id').value = '';
+            document.getElementById('edit-name').value = '';
+            document.getElementById('edit-price').value = '';
+            document.getElementById('edit-original-price').value = '';
+            document.getElementById('edit-img').value = '';
+            document.getElementById('edit-sizes').value = '';
+            document.getElementById('edit-types').value = '';
+            document.getElementById('edit-desc').value = '';
+            document.getElementById('edit-stock-status').value = 'normal';
+            document.querySelector('input[name="discount-type"][value="none"]').click();
+            
+            const catSelect = document.getElementById('edit-category');
+            catSelect.innerHTML = appData.categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('') || '<option value="">默认分类</option>';
+
+            openModal('product-editor');
+        }
+
+        function editProduct(id) {
+            const p = appData.products.find(x => x.id === id);
+            if (!p) return;
+            
+            document.getElementById('edit-product-id').value = p.id;
+            document.getElementById('edit-name').value = p.name;
+            document.getElementById('edit-price').value = p.price;
+            document.getElementById('edit-original-price').value = p.originalPrice || '';
+            document.getElementById('edit-img').value = p.img || '';
+            document.getElementById('edit-sizes').value = p.sizes || '';
+            document.getElementById('edit-types').value = p.types || '';
+            document.getElementById('edit-desc').value = p.desc || '';
+            document.getElementById('edit-stock-status').value = p.stockStatus || 'normal';
+            
+            const discType = p.discountType || 'none';
+            document.querySelector(`input[name="discount-type"][value="${discType}"]`).click();
+            document.getElementById('edit-discount-val').value = p.discountVal || '';
+            
+            const catSelect = document.getElementById('edit-category');
+            catSelect.innerHTML = appData.categories.map(c => `<option value="${c.id}" ${c.id == p.categoryId ? 'selected' : ''}>${c.name}</option>`).join('');
+
+            openModal('product-editor');
+        }
+
+        function saveProduct() {
+            const idVal = document.getElementById('edit-product-id').value;
+            const name = document.getElementById('edit-name').value;
+            const price = document.getElementById('edit-price').value;
+            const originalPrice = document.getElementById('edit-original-price').value;
+            const catId = document.getElementById('edit-category').value;
+            
+            if (!name || !price) {
+                showToast('商品名称和价格不可为空', 'error');
+                return;
+            }
+
+            const productData = {
+                id: idVal ? parseInt(idVal) : Date.now(),
+                name: name,
+                categoryId: catId,
+                price: parseFloat(price),
+                originalPrice: originalPrice ? parseFloat(originalPrice) : null,
+                img: document.getElementById('edit-img').value,
+                sizes: document.getElementById('edit-sizes').value,
+                types: document.getElementById('edit-types').value,
+                desc: document.getElementById('edit-desc').value,
+                stockStatus: document.getElementById('edit-stock-status').value,
+                onShelf: true,
+                discountType: document.querySelector('input[name="discount-type"]:checked').value,
+                discountVal: parseFloat(document.getElementById('edit-discount-val').value) || 0
+            };
+
+            if (idVal) {
+                const existing = appData.products.find(p => p.id == idVal);
+                if (existing) productData.onShelf = existing.onShelf;
+                const idx = appData.products.findIndex(p => p.id == idVal);
+                appData.products[idx] = productData;
+            } else {
+                appData.products.push(productData);
+            }
+
+            saveData();
+            renderAdminProducts();
+            closeModal('product-editor');
+            showToast('商品数据已同步', 'success');
+        }
+
+        function toggleProductStock(id) {
+            const p = appData.products.find(x => x.id === id);
+            if (p) {
+                p.stockStatus = p.stockStatus === 'out_stock' ? 'normal' : 'out_stock';
+                saveData();
+                renderAdminProducts();
+                showToast(`商品状态已切换: ${p.stockStatus === 'normal' ? '现货' : '缺货'}`, 'success');
+            }
+        }
+
+        function batchProductAction(action) {
+            const selected = Array.from(document.querySelectorAll('.product-select:checked')).map(cb => parseInt(cb.value));
+            if (selected.length === 0) {
+                showToast('请先勾选需要操作的商品', 'error');
+                return;
+            }
+            if (action === 'delete') {
+                if(!confirm(`确定要彻底删除这 ${selected.length} 个商品吗？此操作不可逆。`)) return;
+                appData.products = appData.products.filter(p => !selected.includes(p.id));
+            } else {
+                appData.products.forEach(p => {
+                    if (selected.includes(p.id)) {
+                        if (action === 'on_shelf') p.onShelf = true;
+                        if (action === 'off_shelf') p.onShelf = false;
+                        if (action === 'set_normal') p.stockStatus = 'normal';
+                        if (action === 'set_out_stock') p.stockStatus = 'out_stock';
+                    }
+                });
+            }
+            saveData();
+            renderAdminProducts();
+            showToast('批量指令执行成功', 'success');
+        }
+
+        function toggleSelectAll(source) {
+            document.querySelectorAll('.product-select').forEach(cb => cb.checked = source.checked);
+        }
+
+        // --- ADMIN: CATEGORIES MGMT ---
+        function renderAdminCategories() {
+            const tbody = document.getElementById('admin-category-list');
+            tbody.innerHTML = appData.categories.map((cat, idx) => `
+                <tr class="hover:bg-gray-50/50 transition-colors">
+                    <td class="p-5 font-black text-gray-700">${cat.name}</td>
+                    <td class="p-5 text-right">
+                        <button onclick="deleteCategory(${cat.id})" class="text-red-400 hover:text-red-600 p-2.5 rounded-xl transition-colors"><i class="fas fa-trash-alt"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function addCategory() {
+            const name = document.getElementById('new-category-name').value.trim();
+            if (!name) return;
+            appData.categories.push({ id: Date.now(), name });
+            document.getElementById('new-category-name').value = '';
+            saveData();
+            renderAdminCategories();
+            showToast('新分类添加成功', 'success');
+        }
+
+        function deleteCategory(id) {
+            if (confirm('删除分类将导致其下属商品归为“未分类”，是否继续？')) {
+                appData.categories = appData.categories.filter(c => c.id != id);
+                saveData();
+                renderAdminCategories();
+                showToast('分类已移除', 'success');
+            }
+        }
+
+        // --- ADMIN: CONTACTS MGMT ---
+        function renderAdminContacts() {
+            const list = document.getElementById('admin-contact-list');
+            list.innerHTML = appData.contacts.map((c, idx) => `
+                <div class="flex items-center gap-4 p-4 border border-gray-50 bg-white rounded-2xl hover:bg-gray-50 hover:shadow-sm group transition-all">
+                    <div class="w-12 h-12 rounded-xl flex items-center justify-center text-white shadow-sm font-bold" style="background-color: ${c.color}">
+                        <i class="${c.icon} text-lg"></i>
+                    </div>
+                    <div class="flex-1 overflow-hidden">
+                        <div class="font-black text-[9px] uppercase tracking-widest text-gray-400 mb-0.5">${c.platform}</div>
+                        <div class="font-black text-gray-800 truncate text-sm">${c.content}</div>
+                    </div>
+                    <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button onclick="editContact(${idx})" class="p-2.5 text-blue-500 hover:bg-blue-50 rounded-xl transition-colors"><i class="fas fa-pencil-alt"></i></button>
+                        <button onclick="deleteContact(${idx})" class="p-2.5 text-red-500 hover:bg-red-50 rounded-xl transition-colors"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function saveContact() {
+            const idIdx = document.getElementById('contact-edit-id').value;
+            const newC = {
+                id: Date.now(),
+                platform: document.getElementById('contact-platform').value,
+                icon: document.getElementById('contact-icon').value,
+                color: document.getElementById('contact-color').value,
+                content: document.getElementById('contact-content').value,
+                link: document.getElementById('contact-link').value
+            };
+            if (!newC.platform || !newC.content) { showToast('请填写平台名称与展示内容', 'error'); return; }
+            if (idIdx !== '') appData.contacts[parseInt(idIdx)] = newC;
+            else appData.contacts.push(newC);
+            saveData();
+            renderAdminContacts();
+            resetContactForm();
+            showToast('联系方式配置已保存', 'success');
+        }
+
+        function editContact(idx) {
+            const c = appData.contacts[idx];
+            document.getElementById('contact-edit-id').value = idx;
+            document.getElementById('contact-platform').value = c.platform;
+            document.getElementById('contact-icon').value = c.icon;
+            document.getElementById('contact-color').value = c.color;
+            document.getElementById('contact-content').value = c.content;
+            document.getElementById('contact-link').value = c.link || '';
+            document.getElementById('contact-form-title').innerText = "编辑联系方式";
+        }
+
+        function deleteContact(idx) {
+            if(confirm('确定要移除此项联系方式吗？')) {
+                appData.contacts.splice(idx, 1);
+                saveData();
+                renderAdminContacts();
+                showToast('联系方式已删除', 'success');
+            }
+        }
+
+        function resetContactForm() {
+            document.getElementById('contact-edit-id').value = '';
+            document.getElementById('contact-platform').value = '';
+            document.getElementById('contact-icon').value = '';
+            document.getElementById('contact-color').value = '#000000';
+            document.getElementById('contact-content').value = '';
+            document.getElementById('contact-link').value = '';
+            document.getElementById('contact-form-title').innerText = "添加新联系方式";
+        }
+
+        function fillContactPreset(type) {
+            const presets = {
+                'wechat': { platform: '微信 / WECHAT', icon: 'fab fa-weixin', color: '#07c160' },
+                'email': { platform: '邮箱 / EMAIL', icon: 'fas fa-envelope', color: '#3b82f6' },
+                'youtube': { platform: 'YouTube / CHANNEL', icon: 'fab fa-youtube', color: '#ff0000' },
+                'douyin': { platform: '抖音 / TIKTOK', icon: 'fab fa-tiktok', color: '#000000' },
+                'kuaishou': { platform: '快手 / VIDEO', icon: 'fas fa-video', color: '#f97316' }
+            };
+            const p = presets[type];
+            if(p) {
+                document.getElementById('contact-platform').value = p.platform;
+                document.getElementById('contact-icon').value = p.icon;
+                document.getElementById('contact-color').value = p.color;
+            }
+        }
+
+        // --- ADMIN: SETTINGS MGMT ---
+        function loadSettingsToForm() {
+            const s = appData.settings;
+            // Shop Names
+            const nameInputs = document.querySelectorAll('.shop-name-input');
+            nameInputs.forEach(input => {
+                const lang = input.getAttribute('data-lang');
+                input.value = appData.shopNames?.[lang] || (lang === 'zh-CN' ? appData.shopName : '');
+            });
+
+            document.getElementById('setting-notification').value = s.notification || '';
+            document.getElementById('setting-lang').value = s.lang;
+            document.getElementById('setting-currency').value = s.currency;
+            document.getElementById('setting-copyright').value = s.copyright;
+        }
+
+        function saveSettings() {
+            if (!appData.shopNames) appData.shopNames = {};
+            const nameInputs = document.querySelectorAll('.shop-name-input');
+            nameInputs.forEach(input => {
+                appData.shopNames[input.getAttribute('data-lang')] = input.value;
+            });
+
+            const lang = document.getElementById('setting-lang').value;
+            appData.shopName = appData.shopNames[lang] || appData.shopNames['zh-CN'] || "云端商城";
+
+            appData.settings.notification = document.getElementById('setting-notification').value;
+            appData.settings.lang = lang;
+            appData.settings.currency = document.getElementById('setting-currency').value;
+            appData.settings.copyright = document.getElementById('setting-copyright').value;
+            appData.settings.updatedAt = new Date().toLocaleDateString();
+            
+            saveData();
+            showToast('全局配置同步成功', 'success');
+        }
+
+        // --- DATA EXPORT LOGIC ---
+        function exportData() {
+            openModal('loading');
+            setTimeout(() => {
+                try {
+                    let htmlContent = document.documentElement.outerHTML;
+                    const dataScript = `<script>window.EXPORTED_DATA = ${JSON.stringify(appData)};<\/script>`;
+                    
+                    // Cleanup previous data injections
+                    htmlContent = htmlContent.replace(/<script>window\.EXPORTED_DATA = .*?<\/script>/g, ''); 
+                    htmlContent = htmlContent.replace('</head>', `${dataScript}</head>`);
+                    
+                    const blob = new Blob([htmlContent], { type: 'text/html' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `CloudShop_v3_${new Date().toISOString().slice(0,10)}.html`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    
+                    document.getElementById('loading-spinner').classList.add('hidden');
+                    document.getElementById('success-icon').classList.remove('hidden');
+                    document.getElementById('loading-title').innerText = "导出成功 / COMPLETED";
+                    document.getElementById('loading-text').innerText = "站点数据已成功打包至独立静态文件，您可以立即分发使用。";
+                    document.getElementById('loading-close-btn').classList.remove('hidden');
+                } catch (e) {
+                    showToast("导出进程异常，请检查浏览器权限", "error");
+                    closeModal('loading');
+                }
+            }, 1200);
+        }
+
+        // --- UI CORE UTILS ---
+        function openModal(id) {
+            const modal = document.getElementById(`modal-${id}`) || document.getElementById(`view-${id}`);
+            if (!modal) return;
+            modal.classList.remove('hidden');
+            
+            const escHandler = (e) => {
+                if (e.key === 'Escape') {
+                    closeModal(id);
+                    document.removeEventListener('keydown', escHandler);
+                }
+            };
+            document.addEventListener('keydown', escHandler);
+        }
+
+        function closeModal(id) {
+            const modal = document.getElementById(`modal-${id}`) || document.getElementById(`view-${id}`);
+            if (!modal) return;
+            modal.classList.add('hidden');
+            if (id === 'loading') {
+                document.getElementById('loading-spinner').classList.remove('hidden');
+                document.getElementById('success-icon').classList.add('hidden');
+                document.getElementById('loading-close-btn').classList.add('hidden');
+                document.getElementById('loading-title').innerText = "正在处理";
+                document.getElementById('loading-text').innerText = "请稍候...";
+            }
+        }
+
+        function showToast(msg, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const el = document.createElement('div');
+            const colorClass = type === 'error' ? 'bg-red-500 shadow-red-100' : (type === 'success' ? 'bg-green-600 shadow-green-100' : 'bg-orange-600 shadow-orange-100');
+            el.className = `${colorClass} text-white px-6 py-4 rounded-2xl shadow-xl text-xs font-black toast-enter mb-2 flex items-center gap-3 border border-white/10`;
+            
+            const icon = type === 'error' ? 'fa-exclamation-circle' : (type === 'success' ? 'fa-check-circle' : 'fa-info-circle');
+            el.innerHTML = `<i class="fas ${icon} text-lg"></i> <span>${msg}</span>`;
+            
+            container.appendChild(el);
+            setTimeout(() => {
+                el.classList.replace('toast-enter', 'toast-exit');
+                setTimeout(() => el.remove(), 400);
+            }, 3500);
+        }
+
+        function toggleDiscountInput() {
+            const type = document.querySelector('input[name="discount-type"]:checked').value;
+            const input = document.getElementById('edit-discount-val');
+            input.classList.toggle('hidden', type === 'none');
+        }
+
+        init();
+    </script>
+</body>
+</html>
